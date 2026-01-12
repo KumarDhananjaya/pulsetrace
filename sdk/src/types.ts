@@ -7,6 +7,7 @@ export interface PulseConfig {
     maxBreadcrumbs?: number;
     flushInterval?: number;
     maxBatchSize?: number;
+    capturePerformance?: boolean;
 }
 
 export type Severity = 'info' | 'warning' | 'error' | 'fatal';
@@ -17,6 +18,21 @@ export interface Breadcrumb {
     message?: string;
     data?: Record<string, any>;
     level?: Severity;
+    timestamp: number;
+}
+
+export interface Metric {
+    name: string;
+    value: number;
+    rating?: 'good' | 'needs-improvement' | 'poor';
+    extra?: Record<string, any>;
+}
+
+export interface NetworkRequest {
+    url: string;
+    method: string;
+    status: number;
+    duration: number;
     timestamp: number;
 }
 
@@ -32,6 +48,8 @@ export interface PulseEvent {
         stacktrace?: string;
     };
     breadcrumbs?: Breadcrumb[];
+    metrics?: Metric[];
+    network?: NetworkRequest;
     environment?: string;
     release?: string;
     extra?: Record<string, any>;

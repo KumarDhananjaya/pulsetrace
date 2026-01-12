@@ -1,9 +1,10 @@
-import { PulseConfig, PulseEvent, Severity } from './types';
+import { PulseConfig, PulseEvent, Severity, Metric, NetworkRequest } from './types';
 import { Transport } from './transport';
 import { setupConsoleHandlers } from './handlers/console';
 import { setupErrorHandlers } from './handlers/errors';
 import { setupDomHandlers } from './handlers/dom';
 import { setupNavigationHandlers } from './handlers/navigation';
+import { setupPerformanceHandlers } from './handlers/performance';
 import { BreadcrumbManager } from './breadcrumb';
 
 export class PulseTrace {
@@ -16,15 +17,23 @@ export class PulseTrace {
     public static init(config: PulseConfig) {
         const pt = this.getInstance();
         if (pt.initialized) return;
-        pt.config = config;
+        pt.config = {
+            capturePerformance: true,
+            maxBreadcrumbs: 20,
+            ...config
+        };
         pt.transport = new Transport(config.dsn, config.flushInterval, config.maxBatchSize);
-        pt.breadcrumbs = new BreadcrumbManager(config.maxBreadcrumbs || 20);
+        pt.breadcrumbs = new BreadcrumbManager(pt.config.maxBreadcrumbs);
         pt.initialized = true;
 
         setupConsoleHandlers();
         setupErrorHandlers();
         setupDomHandlers();
         setupNavigationHandlers();
+
+        if (pt.config.capturePerformance) {
+            setupPerformanceHandlers();
+        }
 
         if (config.debug) console.log('PulseTrace SDK Initialized');
     }
@@ -35,14 +44,33 @@ export class PulseTrace {
         pt.breadcrumbs.addBreadcrumb(breadcrumb);
     }
 
+    public static captureMetric(metric: Metric) {
+        const pt = this.getInstance();
+        if (!pt.initialized) return;
+
+        pt.sendEvent({
+            level: 'info',
+            message: `Metric: ${metric.name}`,
+            metrics: [metric],
+        });
+    }
+
+    public static captureNetworkRequest(request: NetworkRequest) {
+        const pt = this.getInstance();
+        if (!pt.initialized) return;
+
+        pt.sendEvent({
+            level: 'info',
+            message: `Network: ${request.method} ${request.url}`,
+            network: request,
+        });
+    }
+
     public static captureException(error: Error, options: any = {}) {
         const pt = this.getInstance();
         if (!pt.initialized) return;
 
-        const event: PulseEvent = {
-            event_id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36),
-            timestamp: Date.now(),
-            platform: 'javascript',
+        pt.sendEvent({
             level: options.level || 'error',
             message: error.message,
             exception: {
@@ -50,13 +78,24 @@ export class PulseTrace {
                 value: error.message,
                 stacktrace: error.stack
             },
-            breadcrumbs: pt.breadcrumbs.getBreadcrumbs(),
-            environment: pt.config.environment,
-            release: pt.config.release,
             extra: options.extra
+        });
+    }
+
+    private sendEvent(partialEvent: Partial<PulseEvent>) {
+        const event: PulseEvent = {
+            event_id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
+            timestamp: Date.now(),
+            platform: 'javascript',
+            level: partialEvent.level || 'error',
+            message: partialEvent.message || '',
+            breadcrumbs: this.breadcrumbs.getBreadcrumbs(),
+            environment: this.config.environment,
+            release: this.config.release,
+            ...partialEvent
         };
 
-        pt.transport.sendEvent(event);
+        this.transport.sendEvent(event);
     }
 
     private static getInstance() {
