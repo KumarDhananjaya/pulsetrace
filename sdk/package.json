@@ -1,5 +1,5 @@
 {
-    "name": "@pulsetrace/sdk",
+    "name": "@kumardhananjaya/sdk",
     "version": "0.0.1",
     "description": "Professional-grade telemetry and error tracking SDK for modern web applications.",
     "main": "dist/index.js",
@@ -25,10 +25,10 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/KumarDhananjaya/pulsetrace.git"
+        "url": "git+https://github.com/KumarDhananjaya/pulsetrace.git"
     },
     "publishConfig": {
-        "access": "public"
+        "registry": "https://npm.pkg.github.com/"
     },
     "devDependencies": {
         "typescript": "^5.0.0"
