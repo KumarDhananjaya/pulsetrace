@@ -54,6 +54,59 @@ app.post('/api/collect', collectionRateLimiter, async (req, res) => {
     }
 });
 
+/**
+ * Dashboard Endpoints
+ */
+
+// 1. List all Issues with event counts
+app.get('/api/issues', async (req, res) => {
+    try {
+        const issues = await prisma.issue.findMany({
+            include: {
+                _count: {
+                    select: { events: true }
+                }
+            },
+            orderBy: { lastSeen: 'desc' }
+        });
+
+        // Format for frontend
+        const formatted = issues.map((issue: any) => ({
+            id: issue.id,
+            title: issue.title,
+            type: issue.type,
+            status: issue.status,
+            lastSeen: issue.lastSeen,
+            events: issue._count.events,
+        }));
+
+        res.json(formatted);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch issues' });
+    }
+});
+
+// 2. Get Single Issue with latest events
+app.get('/api/issues/:id', async (req, res) => {
+    try {
+        const issue = await prisma.issue.findUnique({
+            where: { id: req.params.id },
+            include: {
+                events: {
+                    take: 1, // Get the latest event for context
+                    orderBy: { timestamp: 'desc' }
+                }
+            }
+        });
+
+        if (!issue) return res.status(404).json({ error: 'Issue not found' });
+
+        res.json(issue);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch issue details' });
+    }
+});
+
 app.listen(port, () => {
     console.log(`PulseTrace API listening at http://localhost:${port}`);
 });
