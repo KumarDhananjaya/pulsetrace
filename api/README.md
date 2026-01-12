@@ -23,9 +23,9 @@ npm install
 ```
 
 ### Environment Variables
-Create a `.env` file in the `api` root:
+Create a `.env` file in the `api` root (or copy `.env.example`):
 ```env
-DATABASE_URL="postgresql://user:pass@localhost:5432/pulsetrace"
+DATABASE_URL="postgresql://pulsetrace:pulsetrace@localhost:5433/pulsetrace?schema=public"
 REDIS_URL="redis://localhost:6379"
 PORT=3001
 ```

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { IssuesList } from './pages/IssuesList';
+import { IssueDetails } from './pages/IssueDetails';
 
 // Placeholder components for other pages
 const Overview = () => (
@@ -36,6 +37,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Overview />} />
                     <Route path="/issues" element={<IssuesList />} />
+                    <Route path="/issues/:id" element={<IssueDetails />} />
                     <Route path="/performance" element={<Performance />} />
                     <Route path="/realtime" element={<Realtime />} />
                     <Route path="/settings" element={<Settings />} />
