@@ -3,7 +3,7 @@
 [![CI](https://github.com/KumarDhananjaya/pulsetrace/actions/workflows/ci.yml/badge.svg)](https://github.com/KumarDhananjaya/pulsetrace/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-PulseTrace is an open-source, high-performance telemetry and error tracking platform—built to handle millions of events with minimal latency. 
+PulseTrace is an open-source, high-performance telemetry and error tracking platform - built to handle millions of events with minimal latency. 
 
 ## 🏗️ Architecture
 
