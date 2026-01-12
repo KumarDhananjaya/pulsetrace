@@ -47,6 +47,12 @@ Since the package is scoped (`@pulsetrace/sdk`), it is marked as public in confi
    ```bash
    npm publish --access public
    ```
+2. **If you have 2FA enabled**: NPM will prompt you for an OTP (One-Time Password) in the terminal. Enter the code from your authenticator app.
+3. **If it still fails with 403 (2FA required)**: 
+   - Go to [npmjs.com/settings/your-username/tokens](https://www.npmjs.com/settings/).
+   - Generate a **"Granular Access Token"** or **"Automation Token"**.
+   - Ensure the token has `Read and Write` access to your packages.
+   - Use the token to authenticate or follow the [GitHub Actions bypass](https://docs.npmjs.com/generating-access-tokens-on-the-command-line) steps.
 
 ---
 
@@ -60,3 +66,4 @@ Since the package is scoped (`@pulsetrace/sdk`), it is marked as public in confi
 ## ⚠️ Notes
 - **Pre-publish check**: The `prepublishOnly` script in `package.json` automatically runs `npm run build` before publishing to ensure you never ship uncompiled code.
 - **Privacy**: Only files listed in the `files` array in `package.json` (plus README and LICENSE) will be uploaded. Your source code in `src/` remains local to your repository.
+- **Repository Fix**: I have updated the `repository.url` to `git+https://github.com/...` to satisfy NPM's normalization check.

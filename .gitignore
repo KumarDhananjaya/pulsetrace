@@ -9,3 +9,5 @@ build
 *.zip
 *.tar.gz
 *.tgz
+.npmrc
+sdk/.npmrc
