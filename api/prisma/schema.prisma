@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id        String   @id @default(uuid())
+  name      String
+  apiKey    String   @unique @default(uuid())
+  createdAt DateTime @default(now())
+  issues    Issue[]
+}
+
+model Issue {
+  id           String   @id @default(uuid())
+  fingerprint  String   @unique
+  title        String
+  type         String   // e.g., 'Error', 'Exception'
+  status       String   @default("unresolved") // unresolved, resolved, ignored
+  lastSeen     DateTime @default(now())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id])
+  events       Event[]
+  createdAt    DateTime @default(now())
+
+  @@index([projectId])
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  eventId     String   @unique // The ID from the SDK
+  timestamp   DateTime
+  level       String
+  message     String
+  exception   Json?    // Stores type, value, stacktrace
+  breadcrumbs Json?    // Array of breadcrumbs
+  metrics     Json?    // Performance metrics
+  network     Json?    // Network request info
+  environment String?
+  release     String?
+  issueId     String?
+  issue       Issue?    @relation(fields: [issueId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@index([issueId])
+}
