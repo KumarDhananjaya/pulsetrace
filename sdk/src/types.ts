@@ -5,6 +5,8 @@ export interface PulseConfig {
     environment?: string;
     release?: string;
     maxBreadcrumbs?: number;
+    flushInterval?: number;
+    maxBatchSize?: number;
 }
 
 export type Severity = 'info' | 'warning' | 'error' | 'fatal';

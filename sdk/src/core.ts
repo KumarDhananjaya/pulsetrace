@@ -17,7 +17,7 @@ export class PulseTrace {
         const pt = this.getInstance();
         if (pt.initialized) return;
         pt.config = config;
-        pt.transport = new Transport(config.dsn);
+        pt.transport = new Transport(config.dsn, config.flushInterval, config.maxBatchSize);
         pt.breadcrumbs = new BreadcrumbManager(config.maxBreadcrumbs || 20);
         pt.initialized = true;
 
