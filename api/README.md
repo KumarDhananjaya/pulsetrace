@@ -13,13 +13,12 @@ A high-performance Node.js/Express server built to ingest, process, and store te
 
 ### Prerequisites
 - Node.js v18+
-- PostgreSQL
-- Redis
+- Docker (Recommended for Redis & Postgres)
 
 ### Installation
 
 ```bash
-cd api
+docker-compose up -d # Run from the project root
 npm install
 ```
 

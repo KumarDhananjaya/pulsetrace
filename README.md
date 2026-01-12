@@ -26,7 +26,11 @@ graph TD
 ## 🚀 Quick Start
 
 ### 1. Setup Infrastructure
-Ensure you have Redis and PostgreSQL running locally or in Docker.
+The API requires Redis and PostgreSQL. The easiest way is using Docker Compose:
+
+```bash
+docker-compose up -d
+```
 
 ### 2. Install Dependencies
 ```bash
