@@ -1,4 +1,4 @@
-import { Layers, Activity, Shield, Code, Server, Smartphone, Globe } from 'lucide-react';
+import { Layers, Activity, Shield, Code, Globe } from 'lucide-react';
 
 const FeatureCard = ({ title, description, icon: Icon }: any) => (
     <div className="p-6 bg-slate-900/50 border border-slate-800/50 rounded-xl space-y-3">

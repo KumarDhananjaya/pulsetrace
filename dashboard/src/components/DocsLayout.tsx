@@ -1,5 +1,5 @@
 import { Link, useLocation, Outlet } from 'react-router-dom';
-import { BookOpen, Zap, Code, Shield, Layers, ChevronRight, Search, Terminal } from 'lucide-react';
+import { Zap, Code, ChevronRight, Search, Terminal } from 'lucide-react';
 
 const DocsSidebarItem = ({ label, to, active }: { label: string, to: string, active: boolean }) => (
     <Link

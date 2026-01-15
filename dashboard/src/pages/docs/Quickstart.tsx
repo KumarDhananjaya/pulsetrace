@@ -1,4 +1,4 @@
-import { Rocket, Shield, Activity, Terminal, ArrowRight, Check } from 'lucide-react';
+import { Rocket, Terminal, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const CodeBlock = ({ code, language }: { code: string, language: string }) => (

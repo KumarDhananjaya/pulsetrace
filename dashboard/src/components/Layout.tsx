@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, AlertCircle, Activity, Settings, BarChart3, Database, LogOut, BookOpen } from 'lucide-react';
+import { LayoutDashboard, AlertCircle, Activity, Settings, BarChart3, Database, LogOut } from 'lucide-react';
 
 const SidebarItem = ({ icon: Icon, label, to, active }: { icon: any, label: string, to: string, active: boolean }) => (
     <Link
