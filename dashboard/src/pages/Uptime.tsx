@@ -21,7 +21,6 @@ export const Uptime = () => {
     const { user } = useAuth();
     const demoData = useDemoData(true);
     const [monitors, setMonitors] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
 
     // Modal State
@@ -43,7 +42,6 @@ export const Uptime = () => {
             })
             .then(data => {
                 setMonitors(Array.isArray(data) ? data : []);
-                setLoading(false);
             })
             .catch(console.error);
     };

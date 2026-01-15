@@ -1,7 +1,7 @@
-import { Activity, Zap, Layers, MousePointer2, TrendingUp, Monitor, Smartphone, Globe } from 'lucide-react';
+import { Zap, Layers, MousePointer2, TrendingUp, Monitor, Smartphone, Globe } from 'lucide-react';
 import { useDemoData } from '../hooks/useDemoData';
 
-const ScoreCard = ({ title, value, rating, unit, icon: Icon, description, trend }: any) => {
+const ScoreCard = ({ title, value, rating, unit, icon: Icon, trend }: any) => {
     const getColor = (r: string) => {
         if (r === 'good') return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
         if (r === 'needs-improvement') return 'text-amber-500 bg-amber-500/10 border-amber-500/20';

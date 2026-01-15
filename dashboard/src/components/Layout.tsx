@@ -105,12 +105,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                         to="/app/realtime"
                         active={location.pathname === '/app/realtime'}
                     />
-                    <SidebarItem
-                        icon={BookOpen}
-                        label="Documentation"
-                        to="/docs/quickstart"
-                        active={location.pathname.startsWith('/docs')}
-                    />
                 </nav>
 
                 <div className="mt-auto space-y-4">
