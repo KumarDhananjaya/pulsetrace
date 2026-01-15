@@ -10,44 +10,116 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// -----------------------------------------------------------------------------
+// Identity & Access Management (IAM)
+// -----------------------------------------------------------------------------
+
+model User {
+  id            String               @id @default(uuid())
+  email         String               @unique
+  name          String?
+  avatarUrl     String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  
+  // Relations
+  memberships   OrganizationMember[]
+}
+
+model Organization {
+  id            String               @id @default(uuid())
+  name          String
+  slug          String               @unique // for URLs: app.pulsetrace.com/acme-corp
+  plan          String               @default("FREE") // FREE, PRO, ENTERPRISE
+  isPersonal    Boolean              @default(false)  // True if this is a user's personal workspace
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  
+  // Relations
+  members       OrganizationMember[]
+  projects      Project[]
+}
+
+model OrganizationMember {
+  id            String       @id @default(uuid())
+  role          String       @default("MEMBER") // OWNER, ADMIN, MEMBER, VIEWER
+  
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  orgId         String
+  organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  joinedAt      DateTime     @default(now())
+
+  @@unique([userId, orgId])
+}
+
+// -----------------------------------------------------------------------------
+// Telemetry Data
+// -----------------------------------------------------------------------------
+
 model Project {
-  id        String   @id @default(uuid())
-  name      String
-  apiKey    String   @unique @default(uuid())
-  createdAt DateTime @default(now())
-  issues    Issue[]
+  id            String       @id @default(uuid())
+  name          String
+  apiKey        String       @unique @default(uuid()) // The DSN private key for this project
+  platform      String?      // web, mobile-ios, mobile-android, node
+  
+  orgId         String
+  organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  
+  // Relations
+  issues        Issue[]
 }
 
 model Issue {
-  id           String   @id @default(uuid())
-  fingerprint  String   @unique
-  title        String
-  type         String   // e.g., 'Error', 'Exception'
-  status       String   @default("unresolved") // unresolved, resolved, ignored
-  lastSeen     DateTime @default(now())
-  projectId    String
-  project      Project  @relation(fields: [projectId], references: [id])
-  events       Event[]
-  createdAt    DateTime @default(now())
+  id            String       @id @default(uuid())
+  title         String
+  fingerprint   String       // Hash of the stacktrace/error to deduplicate
+  type          String       // 'Error', 'Exception', 'Crash'
+  status        String       @default("unresolved") // unresolved, resolved, ignored
+  
+  projectId     String
+  project       Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  firstSeen     DateTime     @default(now())
+  lastSeen      DateTime     @default(now())
+  eventsCount   Int          @default(0)
+  usersAffected Int          @default(0)
+  
+  // Relations
+  events        Event[]
 
+  @@unique([projectId, fingerprint])
   @@index([projectId])
+  @@index([lastSeen])
 }
 
 model Event {
-  id          String   @id @default(uuid())
-  eventId     String   @unique // The ID from the SDK
-  timestamp   DateTime
-  level       String
-  message     String
-  exception   Json?    // Stores type, value, stacktrace
-  breadcrumbs Json?    // Array of breadcrumbs
-  metrics     Json?    // Performance metrics
-  network     Json?    // Network request info
-  environment String?
-  release     String?
-  issueId     String?
-  issue       Issue?    @relation(fields: [issueId], references: [id])
-  createdAt   DateTime @default(now())
+  id            String       @id @default(uuid())
+  eventId       String       @unique // Client-generated UUID
+  timestamp     DateTime
+  
+  level         String       // info, warning, error, fatal
+  message       String
+  
+  // Context Data (JSONB for flexibility)
+  exception     Json?        // { type: "TypeError", value: "x is null", stacktrace: ... }
+  breadcrumbs   Json?        // [ { type: "click", category: "ui", ... } ]
+  contexts      Json?        // { os: { name: "Mac OS" }, browser: { name: "Chrome" } }
+  request       Json?        // { url: "...", method: "POST" }
+  user          Json?        // { id: "123", email: "..." }
+  tags          Json?        // { release: "v1.0.1", environment: "production" }
+  
+  // Hierarchy
+  issueId       String
+  issue         Issue        @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime     @default(now())
 
   @@index([issueId])
+  @@index([timestamp])
 }
