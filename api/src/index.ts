@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import { collectionRateLimiter } from './middleware/rateLimiter';
 import { addEventToQueue } from './queues/eventQueue';
+import { BatchEventSchema } from './validators/event';
 import './workers/eventWorker'; // Start the worker
 
 dotenv.config();
@@ -40,11 +41,23 @@ app.post('/api/collect', collectionRateLimiter, async (req, res) => {
             return res.status(403).json({ error: 'Invalid API Key' });
         }
 
-        // 2. Queue for async processing
+        // 2. Validate Payload
+        const result = BatchEventSchema.safeParse(req.body);
+
+        if (!result.success) {
+            return res.status(400).json({
+                error: 'Invalid Payload',
+                details: result.error.errors
+            });
+        }
+
+        const events = result.data;
+
+        // 3. Queue for async processing
         // We return 202 immediately to keep the SDK non-blocking
         await addEventToQueue({
             projectId: project.id,
-            events: req.body,
+            events: events,
         });
 
         res.status(202).json({ status: 'accepted' });
