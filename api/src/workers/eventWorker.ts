@@ -1,6 +1,6 @@
 import { Worker, Job } from 'bullmq';
 import { redis } from '../config/redis';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../db';
 import { scrubPII } from '../utils/scrubber';
 import { generateFingerprint } from '../utils/fingerprinter';
 import { resolveStacktrace } from '../utils/sourcemaps';
@@ -88,4 +88,4 @@ export const eventWorker = new Worker(
 );
 
 eventWorker.on('completed', (job) => console.log(`Job ${job.id} completed`));
-eventWorker.on('failed', (job, err) => console.error(`Job ${job?.id} failed:`, err));
+eventWorker.on('failed', (job, err) => console.error(`Job ${job?.id} failed: `, err));

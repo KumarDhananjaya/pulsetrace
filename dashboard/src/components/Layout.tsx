@@ -88,6 +88,12 @@ return (
                 />
                 <SidebarItem
                     icon={Activity}
+                    label="Uptime"
+                    to="/uptime"
+                    active={location.pathname === '/uptime'}
+                />
+                <SidebarItem
+                    icon={Activity}
                     label="Real-time"
                     to="/realtime"
                     active={location.pathname === '/realtime'}

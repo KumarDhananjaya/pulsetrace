@@ -75,6 +75,7 @@ model Project {
   // Relations
   issues        Issue[]
   releases      Release[]
+  monitors      Monitor[]
 }
 
 model Release {
@@ -153,5 +154,45 @@ model Event {
   createdAt     DateTime     @default(now())
 
   @@index([issueId])
+  @@index([timestamp])
+}
+
+// -----------------------------------------------------------------------------
+// Uptime Monitoring
+// -----------------------------------------------------------------------------
+
+model Monitor {
+  id            String         @id @default(uuid())
+  name          String
+  url           String
+  interval      Int            @default(60) // Check interval in seconds
+  type          String         @default("http") // http, ping
+  status        String         @default("up") // up, down, maintenance, paused
+  lastCheck     DateTime?
+  
+  projectId     String
+  project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  checks        MonitorCheck[]
+  
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([projectId])
+}
+
+model MonitorCheck {
+  id            String   @id @default(uuid())
+  status        String   // up, down
+  latency       Int      // ms
+  statusCode    Int?
+  message       String?
+  
+  monitorId     String
+  monitor       Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  
+  timestamp     DateTime @default(now())
+  
+  @@index([monitorId])
   @@index([timestamp])
 }

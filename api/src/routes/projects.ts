@@ -1,10 +1,9 @@
-import express from 'express';
-import { PrismaClient } from '@prisma/client';
+import { Router } from 'express';
+import { prisma } from '../db';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { v4 as uuidv4 } from 'uuid';
 
-const router = express.Router();
-const prisma = new PrismaClient();
+const router = Router();
 
 // List all projects for the current user's organizations
 router.get('/', authenticate, async (req: any, res: any) => {

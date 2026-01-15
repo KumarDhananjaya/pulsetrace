@@ -8,6 +8,7 @@ import { Register } from './pages/Register';
 import { NewProject } from './pages/NewProject';
 import { ProjectSettings } from './pages/ProjectSettings';
 import { Performance } from './pages/Performance';
+import { Uptime } from './pages/Uptime';
 
 // Placeholder components for other pages
 const Overview = () => (
@@ -68,6 +69,9 @@ function App() {
                                     <Route path="/projects/new" element={<NewProject />} />
                                     <Route path="/settings/projects/:id" element={<ProjectSettings />} />
                                     <Route path="/performance" element={<Performance />} />
+                                    <Route path="/performance" element={<Performance />} />
+                                    <Route path="/uptime" element={<Uptime />} />
+                                    <Route path="/realtime" element={<Realtime />} />
                                     <Route path="/realtime" element={<Realtime />} />
                                     <Route path="/settings" element={<Settings />} />
                                     <Route path="*" element={<Navigate to="/" replace />} />

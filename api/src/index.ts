@@ -8,13 +8,13 @@ import { BatchEventSchema } from './validators/event';
 import artifactRoutes from './routes/artifacts';
 import authRoutes from './routes/auth';
 import projectRoutes from './routes/projects';
+import { uptimeRoutes } from './routes/uptime';
 import { authenticate, AuthRequest } from './middleware/auth';
 import './workers/eventWorker'; // Start the worker
 
 dotenv.config();
 
 const app = express();
-const prisma = new PrismaClient();
 const port = process.env.PORT || 3001;
 
 app.use(cors());
@@ -133,6 +133,14 @@ app.get('/api/issues/:id', authenticate, async (req, res) => {
     }
 });
 
+import { startUptimeWorker } from './workers/uptimeWorker';
+
+// ... (existing imports)
+
+// Start Server
 app.listen(port, () => {
-    console.log(`PulseTrace API listening at http://localhost:${port}`);
+    console.log(`API listening at http://localhost:${port}`);
+
+    // Start Background Workers
+    startUptimeWorker();
 });
