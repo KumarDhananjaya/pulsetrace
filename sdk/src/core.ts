@@ -7,6 +7,7 @@ import { setupNavigationHandlers } from './handlers/navigation';
 import { setupPerformanceHandlers } from './handlers/performance';
 import { setupFetchHandlers } from './handlers/fetch';
 import { BreadcrumbManager } from './breadcrumb';
+import { getContexts } from './metadata';
 
 export class PulseTrace {
     private static instance: PulseTrace;
@@ -92,6 +93,7 @@ export class PulseTrace {
             level: partialEvent.level || 'error',
             message: partialEvent.message || '',
             breadcrumbs: this.breadcrumbs.getBreadcrumbs(),
+            contexts: getContexts(),
             environment: this.config.environment,
             release: this.config.release,
             ...partialEvent
