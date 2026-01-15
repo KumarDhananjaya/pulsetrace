@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, AlertCircle, Activity, Settings, BarChart3, Database } from 'lucide-react';
+import { LayoutDashboard, AlertCircle, Activity, Settings, BarChart3, Database, LogOut, ChevronRight } from 'lucide-react';
 
 const SidebarItem = ({ icon: Icon, label, to, active }: { icon: any, label: string, to: string, active: boolean }) => (
     <Link
@@ -18,7 +18,7 @@ const SidebarItem = ({ icon: Icon, label, to, active }: { icon: any, label: stri
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
     const location = useLocation();
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const [projects, setProjects] = useState<any[]>([]);
 
     useEffect(() => {
@@ -107,13 +107,35 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                     />
                 </nav>
 
-                <div className="mt-auto">
+                <div className="mt-auto space-y-4">
                     <SidebarItem
                         icon={Settings}
                         label="Settings"
                         to="/app/settings"
                         active={location.pathname === '/app/settings'}
                     />
+
+                    {/* User Profile & Logout */}
+                    <div className="pt-4 border-t border-slate-800/50">
+                        <div className="bg-slate-900/50 border border-slate-800/50 rounded-xl p-3 flex items-center justify-between group">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-xs font-bold text-white uppercase">
+                                    {user?.name?.slice(0, 2) || 'PT'}
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                    <span className="text-sm font-medium text-white truncate">{user?.name}</span>
+                                    <span className="text-[10px] text-slate-500 truncate lowercase">{user?.email}</span>
+                                </div>
+                            </div>
+                            <button
+                                onClick={logout}
+                                className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-400/10 rounded-lg transition-all"
+                                title="Log Out"
+                            >
+                                <LogOut size={16} />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </aside>
 
