@@ -50,6 +50,7 @@ export interface PulseEvent {
     breadcrumbs?: Breadcrumb[];
     metrics?: Metric[];
     network?: NetworkRequest;
+    contexts?: Record<string, any>;
     environment?: string;
     release?: string;
     extra?: Record<string, any>;
