@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Search, Database, Clock, ChevronRight } from 'lucide-react';
+import { useDemoData } from '../hooks/useDemoData';
 
 const LOG_LEVELS = ['debug', 'info', 'warn', 'error', 'fatal'];
 
@@ -17,6 +18,7 @@ const getLevelColor = (level: string) => {
 
 export const Logs = () => {
     const { user } = useAuth();
+    const demoData = useDemoData(true);
     const [logs, setLogs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [level, setLevel] = useState('');
@@ -28,7 +30,6 @@ export const Logs = () => {
         if (!user) return;
 
         try {
-            // First get projects if we don't have a projectId
             let currentProjectId = projectId;
             if (!currentProjectId) {
                 const projects = await fetch('http://localhost:3001/api/projects', {
@@ -66,11 +67,13 @@ export const Logs = () => {
         return () => clearInterval(interval);
     }, [user, level, search, projectId]);
 
+    const displayLogs = logs.length > 0 ? logs : (demoData?.recentLogs || []);
+
     return (
         <div className="space-y-6 h-[calc(100vh-8rem)] flex flex-col animate-in fade-in">
             <div className="flex justify-between items-center shrink-0">
                 <div>
-                    <h2 className="text-3xl font-bold text-white">Log Explorer</h2>
+                    <h2 className="text-3xl font-bold text-white tracking-tight">Log Explorer</h2>
                     <p className="text-slate-400 mt-1">Search and filter application logs</p>
                 </div>
                 <div className="flex gap-3">
@@ -81,13 +84,13 @@ export const Logs = () => {
                             placeholder="Search logs..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="bg-slate-900 border border-slate-800 rounded-lg pl-10 pr-4 py-2 text-white w-64 focus:ring-2 focus:ring-indigo-500 outline-none"
+                            className="bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-white w-64 focus:ring-2 focus:ring-indigo-500 outline-none"
                         />
                     </div>
                     <select
                         value={level}
                         onChange={(e) => setLevel(e.target.value)}
-                        className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-white focus:ring-2 focus:ring-indigo-500 outline-none"
                     >
                         <option value="">All Levels</option>
                         {LOG_LEVELS.map(l => (
@@ -97,9 +100,9 @@ export const Logs = () => {
                 </div>
             </div>
 
-            <div className="flex-1 bg-slate-950 border border-slate-800 rounded-xl overflow-hidden flex flex-col">
+            <div className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden flex flex-col">
                 <div className="flex-1 overflow-auto font-mono text-sm p-4 space-y-1 custom-scrollbar" ref={scrollRef}>
-                    {logs.map((log) => (
+                    {displayLogs.map((log) => (
                         <div key={log.id} className="group flex items-start gap-4 hover:bg-white/5 p-1 rounded transition-colors border-l-2 border-transparent">
                             <span className="text-slate-600 shrink-0 select-none">
                                 {new Date(log.timestamp).toLocaleTimeString([], { hour12: false })}
@@ -121,7 +124,7 @@ export const Logs = () => {
                         </div>
                     ))}
 
-                    {logs.length === 0 && !loading && (
+                    {displayLogs.length === 0 && !loading && (
                         <div className="h-full flex flex-col items-center justify-center text-slate-600 space-y-4">
                             <Database size={48} />
                             <p>No logs found matching your criteria</p>
@@ -132,10 +135,10 @@ export const Logs = () => {
                 <div className="shrink-0 bg-slate-900/50 border-t border-slate-800 px-4 py-2 flex justify-between items-center text-xs text-slate-500">
                     <div className="flex items-center gap-4">
                         <span className="flex items-center gap-1">
-                            <Clock size={12} />
+                            <Clock size={12} className="animate-pulse text-emerald-500" />
                             Streaming active
                         </span>
-                        <span>Showing {logs.length} logs</span>
+                        <span>Showing {displayLogs.length} logs</span>
                     </div>
                 </div>
             </div>

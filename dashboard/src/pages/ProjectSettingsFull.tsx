@@ -1,4 +1,4 @@
-import { Settings, Key, Bell, Shield, Trash2, Globe, Copy, Check } from 'lucide-react';
+import { Settings, Key, Bell, Trash2, Copy, Check } from 'lucide-react';
 import { useState } from 'react';
 
 export const ProjectSettingsFull = () => {

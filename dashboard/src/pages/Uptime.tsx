@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Plus, CheckCircle, XCircle, Clock, Zap, Globe, Activity } from 'lucide-react';
+import { Plus, CheckCircle, XCircle, Zap, Globe } from 'lucide-react';
 import { useDemoData } from '../hooks/useDemoData';
 
 const UptimeBar = ({ history }: { history: any[] }) => (
