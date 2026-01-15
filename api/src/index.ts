@@ -7,6 +7,7 @@ import { addEventToQueue } from './queues/eventQueue';
 import { BatchEventSchema } from './validators/event';
 import artifactRoutes from './routes/artifacts';
 import authRoutes from './routes/auth';
+import { authenticate, AuthRequest } from './middleware/auth';
 import './workers/eventWorker'; // Start the worker
 
 dotenv.config();
@@ -80,7 +81,7 @@ app.post('/api/collect', collectionRateLimiter, async (req, res) => {
  */
 
 // 1. List all Issues with event counts
-app.get('/api/issues', async (req, res) => {
+app.get('/api/issues', authenticate, async (req, res) => {
     try {
         const issues = await prisma.issue.findMany({
             include: {
@@ -108,7 +109,7 @@ app.get('/api/issues', async (req, res) => {
 });
 
 // 2. Get Single Issue with latest events
-app.get('/api/issues/:id', async (req, res) => {
+app.get('/api/issues/:id', authenticate, async (req, res) => {
     try {
         const issue = await prisma.issue.findUnique({
             where: { id: req.params.id },

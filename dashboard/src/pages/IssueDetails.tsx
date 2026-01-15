@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { ChevronLeft, Clock, Monitor, Globe, Shield, Terminal, Activity, Loader2 } from 'lucide-react';
 
 interface Breadcrumb {
@@ -33,14 +34,17 @@ interface IssueDetail {
 
 export const IssueDetails = () => {
     const { id } = useParams();
+    const { token } = useAuth();
     const [issue, setIssue] = useState<IssueDetail | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        if (!id) return;
+        if (!id || !token) return;
 
-        fetch(`http://localhost:3001/api/issues/${id}`)
+        fetch(`http://localhost:3001/api/issues/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
             .then(async res => {
                 if (!res.ok) throw new Error('Failed to fetch issue details');
                 return res.json();

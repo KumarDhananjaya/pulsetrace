@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Clock, Loader2 } from 'lucide-react';
 
+import { useAuth } from '../context/AuthContext';
+
 interface Issue {
     id: string;
     title: string;
@@ -14,12 +16,17 @@ interface Issue {
 
 export const IssuesList = () => {
     const navigate = useNavigate();
+    const { token } = useAuth();
     const [issues, setIssues] = useState<Issue[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        fetch('http://localhost:3001/api/issues')
+        if (!token) return;
+
+        fetch('http://localhost:3001/api/issues', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
             .then(async res => {
                 if (!res.ok) throw new Error('Failed to fetch issues');
                 return res.json();
