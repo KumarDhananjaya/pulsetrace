@@ -52,6 +52,50 @@ router.post('/register', async (req, res) => {
                 }
             });
 
+            /*
+           ### Validation
+1.  Create a Monitor for `google.com`.
+2.  Wait for worker to run.
+3.  Verify status is "Up".
+4.  Create a Monitor for `http://non-existent-url.test`.
+5.  Verify status is "Down".
+
+---
+
+## Phase 8: Log Management
+
+### Goal
+Provide a centralized platform for ingesting and searching application logs. This will allow users to send raw log strings or structured JSON to PulseTrace and view them in a searchable stream.
+
+### Proposed Changes
+
+#### Database Schema (`api/prisma/schema.prisma`)
+1.  **New Model: `Log`**
+    -   `id`, `projectId`
+    -   `level` (debug, info, warn, error, fatal)
+    -   `message` (String)
+    -   `timestamp` (DateTime, default: now)
+    -   `metadata` (Json) - for structured logging.
+    -   `source` (string) - e.g. "backend", "frontend", "worker".
+
+#### API (`api/src`)
+1.  **Ingestion** (`routes/logs.ts`):
+    -   `POST /api/logs`: Public/DSN-based ingestion (similar to events).
+    -   For MVP, we will reuse the `authenticate` middleware or a `DSN` check.
+2.  **Querying**:
+    -   `GET /api/projects/:id/logs`: List logs with filtering by level and basic text search.
+
+#### Dashboard (`dashboard/src`)
+1.  **New Page**: `Logs.tsx`.
+    -   **Log Stream**: A real-time (polling) list of logs.
+    -   **Filters**: Level dropdown, search input.
+    -   **Visuals**: Color-coded levels (Blue for Info, Yellow for Warn, Red for Error).
+
+### Validation
+1.  Send a test log via `curl`.
+2.  Verify it appears in the Dashboard.
+3.  Search for a specific keyword and verify filtering.
+            */
             // Create a default project "My First Project"
             await tx.project.create({
                 data: {

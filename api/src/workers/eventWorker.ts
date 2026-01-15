@@ -6,7 +6,7 @@ import { generateFingerprint } from '../utils/fingerprinter';
 import { resolveStacktrace } from '../utils/sourcemaps';
 import { EVENT_QUEUE_NAME } from '../queues/eventQueue';
 
-const prisma = new PrismaClient();
+// Using prisma imported from ../db
 
 export const eventWorker = new Worker(
     EVENT_QUEUE_NAME,
@@ -73,9 +73,9 @@ export const eventWorker = new Worker(
                         metrics: (event.metrics || undefined) as any,
                         network: (event.network || undefined) as any,
                         contexts: (event.contexts || undefined) as any,
-                        environment: event.environment || null,
-                        release: event.release || null,
-                        issueId: issueId || null,
+                        environment: event.environment || undefined,
+                        release: event.release || undefined,
+                        issueId: issueId || undefined,
                     },
                 });
             } catch (err) {

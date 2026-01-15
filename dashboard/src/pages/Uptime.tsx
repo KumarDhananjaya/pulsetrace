@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Activity, Plus, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Plus, CheckCircle, XCircle, Clock } from 'lucide-react';
 
 export const Uptime = () => {
-    const { id: projectId } = useParams(); // Start with project context or global
     const { token } = useAuth();
     const [monitors, setMonitors] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);

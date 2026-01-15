@@ -1,16 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { Activity, Zap, Layers, Timer, MousePointer2 } from 'lucide-react';
+import { Activity, Zap, Layers, MousePointer2 } from 'lucide-react';
 
-interface MetricEvent {
-    id: string;
-    timestamp: string;
-    metrics: Record<string, {
-        value: number;
-        rating: 'good' | 'needs-improvement' | 'poor';
-        metric_id: string;
-    }>;
-}
 
 const ScoreCard = ({ title, value, rating, unit, icon: Icon, description }: any) => {
     const getColor = (r: string) => {
@@ -46,15 +35,10 @@ const ScoreCard = ({ title, value, rating, unit, icon: Icon, description }: any)
 };
 
 export const Performance = () => {
-    const { token } = useAuth();
     // In a real app, we would fetch aggregated stats (avg, p75) from the API.
     // For this MVP, we might need a new endpoint or just list recent events.
     // Let's create a placeholder view that explains what would be here or fetches raw events if easy.
-    const [stats, setStats] = useState<any>({
-        lcp: { value: 0, rating: 'good', count: 0 },
-        in: { value: 0, rating: 'good', count: 0 },
-        cls: { value: 0, rating: 'good', count: 0 },
-    });
+
 
     return (
         <div className="space-y-8 animate-in fade-in">

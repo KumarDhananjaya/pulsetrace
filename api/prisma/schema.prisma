@@ -76,6 +76,7 @@ model Project {
   issues        Issue[]
   releases      Release[]
   monitors      Monitor[]
+  logs          Log[]
 }
 
 model Release {
@@ -195,4 +196,24 @@ model MonitorCheck {
   
   @@index([monitorId])
   @@index([timestamp])
+}
+
+// -----------------------------------------------------------------------------
+// Log Management
+// -----------------------------------------------------------------------------
+
+model Log {
+  id          String   @id @default(uuid())
+  level       String   // debug, info, warn, error, fatal
+  message     String
+  metadata    Json?    // for structured logging
+  source      String?  // e.g. "backend", "frontend"
+  timestamp   DateTime @default(now())
+  
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([timestamp])
+  @@index([level])
 }
