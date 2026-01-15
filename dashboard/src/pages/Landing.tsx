@@ -54,6 +54,7 @@ export const Landing = () => {
                         <a href="#features" className="text-sm font-medium hover:text-white transition-colors">Features</a>
                         <a href="#solutions" className="text-sm font-medium hover:text-white transition-colors">Solutions</a>
                         <a href="#pricing" className="text-sm font-medium hover:text-white transition-colors">Pricing</a>
+                        <Link to="/docs/quickstart" className="text-sm font-medium hover:text-white transition-colors">Docs</Link>
                         <div className="h-4 w-[1px] bg-white/10"></div>
                         <Link to="/login" className="text-sm font-medium hover:text-white transition-colors">Sign in</Link>
                         <Link to="/register" className="bg-white text-black px-4 py-2 rounded-full text-sm font-bold hover:bg-slate-200 transition-all active:scale-95">
@@ -74,6 +75,7 @@ export const Landing = () => {
                         <a href="#features" onClick={() => setIsMenuOpen(false)}>Features</a>
                         <a href="#solutions" onClick={() => setIsMenuOpen(false)}>Solutions</a>
                         <a href="#pricing" onClick={() => setIsMenuOpen(false)}>Pricing</a>
+                        <Link to="/docs/quickstart" onClick={() => setIsMenuOpen(false)}>Docs</Link>
                         <hr className="border-white/10" />
                         <Link to="/login">Sign in</Link>
                         <Link to="/register" className="bg-indigo-600 text-white p-4 rounded-xl text-center">Start for free</Link>
@@ -105,9 +107,9 @@ export const Landing = () => {
                             <Link to="/register" className="w-full sm:w-auto bg-white text-black px-8 py-4 rounded-full text-lg font-bold hover:bg-slate-200 transition-all flex items-center justify-center gap-2 shadow-xl shadow-white/10 group">
                                 Get Started <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                             </Link>
-                            <a href="#docs" className="w-full sm:w-auto px-8 py-4 rounded-full text-lg font-bold border border-white/10 hover:bg-white/5 transition-all text-white">
+                            <Link to="/docs/quickstart" className="w-full sm:w-auto px-8 py-4 rounded-full text-lg font-bold border border-white/10 hover:bg-white/5 transition-all text-white flex items-center justify-center">
                                 View Documentation
-                            </a>
+                            </Link>
                         </div>
                     </div>
 
@@ -248,7 +250,7 @@ export const Landing = () => {
                             </span>
                         </div>
                         <div className="flex gap-10 text-sm font-medium text-slate-500">
-                            <a href="#" className="hover:text-white transition-colors">Documentation</a>
+                            <Link to="/docs/quickstart" className="hover:text-white transition-colors">Documentation</Link>
                             <a href="#" className="hover:text-white transition-colors">Changelog</a>
                             <a href="#" className="hover:text-white transition-colors">Privacy</a>
                             <a href="#" className="hover:text-white transition-colors">Terms</a>
