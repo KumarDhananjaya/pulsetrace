@@ -34,16 +34,16 @@ interface IssueDetail {
 
 export const IssueDetails = () => {
     const { id } = useParams();
-    const { token } = useAuth();
+    const { user } = useAuth();
     const [issue, setIssue] = useState<IssueDetail | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        if (!id || !token) return;
+        if (!id || !user) return;
 
         fetch(`http://localhost:3001/api/issues/${id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         })
             .then(async res => {
                 if (!res.ok) throw new Error('Failed to fetch issue details');

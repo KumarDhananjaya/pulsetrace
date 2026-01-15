@@ -1,168 +1,168 @@
-import express, { Router } from 'express';
+import express from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { prisma } from '../db';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { authService } from '../services/AuthService';
+import { sessionService } from '../services/SessionService';
+import { googleProvider } from '../providers/GoogleProvider';
+import { githubProvider } from '../providers/GitHubProvider';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-default-key';
 
-// REGISTER
+const getProvider = (name: string) => {
+    switch (name.toLowerCase()) {
+        case 'google': return googleProvider;
+        case 'github': return githubProvider;
+        default: return null;
+    }
+};
+
+const sendTokens = (res: any, tokens: { accessToken: string, refreshToken: string }) => {
+    res.cookie('session', tokens.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 15 * 60 * 1000
+    });
+    res.cookie('refresh', tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 30 * 24 * 60 * 60 * 1000
+    });
+};
+
 router.post('/register', async (req, res) => {
     const { email, password, name } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password are required' });
-    }
+    if (!email || !password) return res.status(400).json({ error: 'Missing fields' });
 
     try {
         const existingUser = await prisma.user.findUnique({ where: { email } });
-        if (existingUser) {
-            return res.status(400).json({ error: 'User already exists' });
-        }
+        if (existingUser) return res.status(400).json({ error: 'User exists' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Transaction: Create User + Personal Org + Organization Member
-        const result = await prisma.$transaction(async (tx) => {
-            const user = await tx.user.create({
-                data: {
-                    email,
-                    password: hashedPassword,
-                    name: name || email.split('@')[0],
-                    avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-                }
-            });
+        const { user } = await authService.handleOAuthCallback('password', {
+            id: email,
+            email,
+            name,
+            avatarUrl: null,
+            emailVerified: false
+        }, {});
 
-            // Create Personal Workspace
-            const workspaceName = `${user.name || 'User'}'s Workspace`;
-            const slug = (user.name || 'user').toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(Math.random() * 10000);
-
-            const org = await tx.organization.create({
-                data: {
-                    name: workspaceName,
-                    slug: slug,
-                    isPersonal: true,
-                    members: {
-                        create: {
-                            userId: user.id,
-                            role: 'OWNER'
-                        }
-                    }
-                }
-            });
-
-            /*
-           ### Validation
-1.  Create a Monitor for `google.com`.
-2.  Wait for worker to run.
-3.  Verify status is "Up".
-4.  Create a Monitor for `http://non-existent-url.test`.
-5.  Verify status is "Down".
-
----
-
-## Phase 8: Log Management
-
-### Goal
-Provide a centralized platform for ingesting and searching application logs. This will allow users to send raw log strings or structured JSON to PulseTrace and view them in a searchable stream.
-
-### Proposed Changes
-
-#### Database Schema (`api/prisma/schema.prisma`)
-1.  **New Model: `Log`**
-    -   `id`, `projectId`
-    -   `level` (debug, info, warn, error, fatal)
-    -   `message` (String)
-    -   `timestamp` (DateTime, default: now)
-    -   `metadata` (Json) - for structured logging.
-    -   `source` (string) - e.g. "backend", "frontend", "worker".
-
-#### API (`api/src`)
-1.  **Ingestion** (`routes/logs.ts`):
-    -   `POST /api/logs`: Public/DSN-based ingestion (similar to events).
-    -   For MVP, we will reuse the `authenticate` middleware or a `DSN` check.
-2.  **Querying**:
-    -   `GET /api/projects/:id/logs`: List logs with filtering by level and basic text search.
-
-#### Dashboard (`dashboard/src`)
-1.  **New Page**: `Logs.tsx`.
-    -   **Log Stream**: A real-time (polling) list of logs.
-    -   **Filters**: Level dropdown, search input.
-    -   **Visuals**: Color-coded levels (Blue for Info, Yellow for Warn, Red for Error).
-
-### Validation
-1.  Send a test log via `curl`.
-2.  Verify it appears in the Dashboard.
-3.  Search for a specific keyword and verify filtering.
-            */
-            // Create a default project "My First Project"
-            await tx.project.create({
-                data: {
-                    name: 'My First Project',
-                    platform: 'web',
-                    orgId: org.id
-                }
-            });
-
-            return user;
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { password: hashedPassword }
         });
 
-        const token = jwt.sign({ userId: result.id, email: result.email }, JWT_SECRET, { expiresIn: '7d' });
-
-        res.status(201).json({
-            token,
-            user: { id: result.id, email: result.email, name: result.name }
+        const tokens = await sessionService.createSession(user.id, {
+            userAgent: req.headers['user-agent'],
+            ipAddress: req.ip
         });
 
+        sendTokens(res, tokens);
+        res.status(201).json({ user });
     } catch (err) {
-        console.error('Registration error:', err);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Registration failed' });
     }
 });
 
-// LOGIN
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password are required' });
-    }
+    if (!email || !password) return res.status(400).json({ error: 'Missing fields' });
 
     try {
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
+        const user = await prisma.user.findUnique({ where: { email } }) as any;
+        if (!user || !user.password) return res.status(401).json({ error: 'Invalid credentials' });
 
         const isValid = await bcrypt.compare(password, user.password);
-        if (!isValid) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
+        if (!isValid) return res.status(401).json({ error: 'Invalid credentials' });
 
-        const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-
-        res.json({
-            token,
-            user: { id: user.id, email: user.email, name: user.name, avatarUrl: user.avatarUrl }
+        const tokens = await sessionService.createSession(user.id, {
+            userAgent: req.headers['user-agent'],
+            ipAddress: req.ip
         });
 
+        sendTokens(res, tokens);
+        res.json({ user: { id: user.id, email: user.email, name: user.name } });
     } catch (err) {
-        console.error('Login error:', err);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Login failed' });
     }
 });
 
-// ME (Protected)
-router.get('/me', authenticate, async (req: any, res: any) => {
+router.get('/oauth/:provider', (req, res) => {
+    const provider = getProvider(req.params.provider);
+    if (!provider) return res.status(400).json({ error: 'Invalid provider' });
+
+    const state = Math.random().toString(36).substring(7);
+    res.cookie('oauth_state', state, { httpOnly: true, maxAge: 300000 });
+
+    const url = provider.getAuthorizationUrl(state);
+    res.redirect(url);
+});
+
+router.get('/callback/:provider', async (req, res) => {
+    const { code, state } = req.query;
+    const { oauth_state } = req.cookies;
+
+    if (!code || state !== oauth_state) {
+        return res.status(400).json({ error: 'Invalid state or missing code' });
+    }
+
+    const provider = getProvider(req.params.provider);
+    if (!provider) return res.status(400).json({ error: 'Invalid provider' });
+
+    try {
+        const pTokens = await provider.exchangeCode(code as string);
+        const userInfo = await provider.getUserInfo(pTokens.accessToken);
+
+        const { user } = await authService.handleOAuthCallback(req.params.provider, userInfo, pTokens);
+
+        const tokens = await sessionService.createSession(user.id, {
+            userAgent: req.headers['user-agent'],
+            ipAddress: req.ip
+        });
+
+        sendTokens(res, tokens);
+        res.clearCookie('oauth_state');
+        res.redirect(process.env.FRONTEND_URL || 'http://localhost:5173/app');
+    } catch (err) {
+        console.error('OAuth callback error:', err);
+        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=oauth_failed`);
+    }
+});
+
+router.post('/refresh', async (req, res) => {
+    const refreshToken = req.cookies?.refresh;
+    if (!refreshToken) return res.status(401).json({ error: 'No refresh token' });
+
+    try {
+        const tokens = await sessionService.refreshSession(refreshToken);
+        sendTokens(res, tokens);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(401).json({ error: 'Invalid or expired session' });
+    }
+});
+
+router.post('/logout', async (req, res) => {
+    const refreshToken = req.cookies?.refresh;
+    if (refreshToken) await sessionService.revokeSession(refreshToken);
+
+    res.clearCookie('session');
+    res.clearCookie('refresh');
+    res.json({ success: true });
+});
+
+router.get('/me', authenticate, async (req: AuthRequest, res) => {
     try {
         const user = await prisma.user.findUnique({
-            where: { id: req.user.id },
-            select: { id: true, email: true, name: true, avatarUrl: true }
-        });
+            where: { id: req.user!.id },
+            select: { id: true, email: true, name: true, avatarUrl: true, emailVerified: true }
+        }) as any;
         res.json(user);
     } catch (err) {
-        res.status(500).json({ error: 'Failed to fetch profile' });
+        res.status(500).json({ error: 'Profile fetch failed' });
     }
 });
 

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import { collectionRateLimiter } from './middleware/rateLimiter';
 import { addEventToQueue } from './queues/eventQueue';
 import { BatchEventSchema } from './validators/event';

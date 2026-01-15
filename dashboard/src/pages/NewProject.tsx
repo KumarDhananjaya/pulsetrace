@@ -9,7 +9,7 @@ export const NewProject = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const { token } = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -21,9 +21,9 @@ export const NewProject = () => {
             const res = await fetch('http://localhost:3001/api/projects', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify({ name, platform })
             });
 
@@ -67,8 +67,8 @@ export const NewProject = () => {
                                 key={p}
                                 onClick={() => setPlatform(p)}
                                 className={`flex items-center justify-center gap-2 p-4 rounded-lg border transition-all ${platform === p
-                                        ? 'bg-indigo-500/10 border-indigo-500 text-indigo-400'
-                                        : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700'
+                                    ? 'bg-indigo-500/10 border-indigo-500 text-indigo-400'
+                                    : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700'
                                     }`}
                             >
                                 {p === 'web' && <Layers size={18} />}

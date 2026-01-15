@@ -5,19 +5,19 @@ import { Copy, Check, Terminal, Key } from 'lucide-react';
 
 export const ProjectSettings = () => {
     const { id } = useParams();
-    const { token } = useAuth();
+    const { user } = useAuth();
     const [project, setProject] = useState<any>(null);
     const [copied, setCopied] = useState(false);
 
     useEffect(() => {
-        if (!id || !token) return;
+        if (!id || !user) return;
         fetch(`http://localhost:3001/api/projects/${id}`, {
-            headers: { Authorization: `Bearer ${token}` }
+            credentials: 'include'
         })
             .then(res => res.json())
             .then(setProject)
             .catch(console.error);
-    }, [id, token]);
+    }, [id, user]);
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);

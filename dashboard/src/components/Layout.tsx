@@ -18,20 +18,20 @@ const SidebarItem = ({ icon: Icon, label, to, active }: { icon: any, label: stri
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
     const location = useLocation();
-    const { token } = useAuth();
+    const { user } = useAuth();
     const [projects, setProjects] = useState<any[]>([]);
 
     useEffect(() => {
-        if (!token) return;
+        if (!user) return;
         fetch('http://localhost:3001/api/projects', {
-            headers: { Authorization: `Bearer ${token}` }
+            credentials: 'include'
         })
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) setProjects(data);
             })
             .catch(console.error);
-    }, [token]);
+    }, [user]);
 
     return (
         <div className="flex min-h-screen bg-[#0a0c10] text-slate-200">

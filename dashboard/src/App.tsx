@@ -11,6 +11,9 @@ import { Performance } from './pages/Performance';
 import { Uptime } from './pages/Uptime';
 import { Logs } from './pages/Logs';
 import { Landing } from './pages/Landing';
+import { Features } from './pages/Features';
+import { Pricing } from './pages/Pricing';
+import { Solutions } from './pages/Solutions';
 
 // Placeholder components for other pages
 const Overview = () => (
@@ -59,6 +62,9 @@ function App() {
             <Router>
                 <Routes>
                     <Route path="/" element={<Landing />} />
+                    <Route path="/features" element={<Features />} />
+                    <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/solutions" element={<Solutions />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
 

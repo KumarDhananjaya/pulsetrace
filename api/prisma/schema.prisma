@@ -17,14 +17,72 @@ datasource db {
 model User {
   id            String               @id @default(uuid())
   email         String               @unique
-  password      String
+  password      String?              // Optional if using ONLY OAuth
   name          String?
   avatarUrl     String?
+  emailVerified DateTime?
+  status        String               @default("ACTIVE") // ACTIVE, SUSPENDED, DEACTIVATED
+  isProfileLocked Boolean            @default(false)
+  lastLoginAt   DateTime?
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
   
   // Relations
+  identities    UserIdentity[]
+  sessions      Session[]
+  auditLogs     AuditLog[]
   memberships   OrganizationMember[]
+}
+
+model UserIdentity {
+  id           String   @id @default(uuid())
+  provider     String   // google, github, microsoft, apple
+  providerId   String   // The unique ID from the provider
+  email        String?  // Email from the provider (if different or for linking)
+  accessToken  String?  @db.Text
+  refreshToken String?  @db.Text
+  expiresAt    DateTime?
+
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([provider, providerId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  token        String   @unique // Refresh token or session identifier
+  userAgent    String?
+  ipAddress    String?
+  deviceInfo   Json?    // OS, Browser, Location etc.
+  expiresAt    DateTime
+  
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime @default(now())
+  lastUsedAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  event       String   // login.success, login.failed, password.change, identity.linked, etc.
+  description String?
+  metadata    Json?    // IP, userAgent, etc.
+  
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([event])
 }
 
 model Organization {

@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Plus, CheckCircle, XCircle, Clock } from 'lucide-react';
 
 export const Uptime = () => {
-    const { token } = useAuth();
+    const { user } = useAuth();
     const [monitors, setMonitors] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -21,13 +21,13 @@ export const Uptime = () => {
         // SIMPLIFICATION: We will fetch /api/projects first, then pick the first one to show monitors for.
 
         fetch('http://localhost:3001/api/projects', {
-            headers: { Authorization: `Bearer ${token}` }
+            credentials: 'include'
         })
             .then(res => res.json())
             .then(projects => {
                 if (projects.length > 0) {
                     return fetch(`http://localhost:3001/api/projects/${projects[0].id}/monitors`, {
-                        headers: { Authorization: `Bearer ${token}` }
+                        credentials: 'include'
                     }).then(res => res.json());
                 }
                 return [];
@@ -40,17 +40,17 @@ export const Uptime = () => {
     };
 
     useEffect(() => {
-        if (token) fetchMonitors();
+        if (user) fetchMonitors();
         const interval = setInterval(fetchMonitors, 10000); // Poll every 10s
         return () => clearInterval(interval);
-    }, [token]);
+    }, [user]);
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             // Fetch projects again to get ID (hacky, should utilize context)
             const projects = await fetch('http://localhost:3001/api/projects', {
-                headers: { Authorization: `Bearer ${token}` }
+                credentials: 'include'
             }).then(res => res.json());
 
             if (projects.length === 0) return alert('Create a project first!');
@@ -58,9 +58,9 @@ export const Uptime = () => {
             await fetch('http://localhost:3001/api/monitors', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     name,
                     url,

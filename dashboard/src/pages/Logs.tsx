@@ -16,7 +16,7 @@ const getLevelColor = (level: string) => {
 };
 
 export const Logs = () => {
-    const { token } = useAuth();
+    const { user } = useAuth();
     const [logs, setLogs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [level, setLevel] = useState('');
@@ -25,14 +25,14 @@ export const Logs = () => {
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const fetchLogs = async () => {
-        if (!token) return;
+        if (!user) return;
 
         try {
             // First get projects if we don't have a projectId
             let currentProjectId = projectId;
             if (!currentProjectId) {
                 const projects = await fetch('http://localhost:3001/api/projects', {
-                    headers: { Authorization: `Bearer ${token}` }
+                    credentials: 'include'
                 }).then(res => res.json());
 
                 if (projects.length > 0) {
@@ -49,7 +49,7 @@ export const Logs = () => {
             if (search) query.append('search', search);
 
             const data = await fetch(`http://localhost:3001/api/logs/projects/${currentProjectId}/logs?${query.toString()}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                credentials: 'include'
             }).then(res => res.json());
 
             setLogs(Array.isArray(data) ? data : []);
@@ -64,7 +64,7 @@ export const Logs = () => {
         fetchLogs();
         const interval = setInterval(fetchLogs, 5000);
         return () => clearInterval(interval);
-    }, [token, level, search, projectId]);
+    }, [user, level, search, projectId]);
 
     return (
         <div className="space-y-6 h-[calc(100vh-8rem)] flex flex-col animate-in fade-in">

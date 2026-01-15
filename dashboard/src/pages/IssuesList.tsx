@@ -16,30 +16,30 @@ interface Issue {
 
 export const IssuesList = () => {
     const navigate = useNavigate();
-    const { token } = useAuth();
+    const { user } = useAuth();
     const [issues, setIssues] = useState<Issue[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        if (!token) return;
-
-        fetch('http://localhost:3001/api/issues', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-            .then(async res => {
-                if (!res.ok) throw new Error('Failed to fetch issues');
-                return res.json();
+        if (!user) return;
+        +
+            fetch('http://localhost:3001/api/issues', {
+                credentials: 'include'
             })
-            .then((data) => {
-                setIssues(data);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error(err);
-                setError('Could not load issues. Is the API running?');
-                setLoading(false);
-            });
+                .then(async res => {
+                    if (!res.ok) throw new Error('Failed to fetch issues');
+                    return res.json();
+                })
+                .then((data) => {
+                    setIssues(data);
+                    setLoading(false);
+                })
+                .catch(err => {
+                    console.error(err);
+                    setError('Could not load issues. Is the API running?');
+                    setLoading(false);
+                });
     }, []);
 
     if (loading) {
