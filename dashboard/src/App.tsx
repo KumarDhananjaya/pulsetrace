@@ -17,6 +17,7 @@ import { Solutions } from './pages/Solutions';
 import { DocsLayout } from './components/DocsLayout';
 import { Quickstart } from './pages/docs/Quickstart';
 import { SDKIntegration } from './pages/docs/SDKIntegration';
+import { Architecture } from './pages/docs/Architecture';
 
 // Placeholder components for other pages
 const Overview = () => (
@@ -42,6 +43,8 @@ const Overview = () => (
 );
 
 const Architecture = () => <h2 className="text-3xl font-bold text-white italic">Internal Architecture</h2>;
+const Realtime = () => <h2 className="text-3xl font-bold text-white italic">Real-time Feed</h2>;
+const Settings = () => <h2 className="text-3xl font-bold text-white italic">Settings</h2>;
 const DocsPlaceholder = ({ title }: { title: string }) => (
     <div className="animate-in fade-in duration-700">
         <h1 className="text-4xl font-extrabold text-white mb-6 tracking-tight">{title}</h1>
