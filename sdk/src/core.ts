@@ -5,6 +5,7 @@ import { setupErrorHandlers } from './handlers/errors';
 import { setupDomHandlers } from './handlers/dom';
 import { setupNavigationHandlers } from './handlers/navigation';
 import { setupPerformanceHandlers } from './handlers/performance';
+import { setupFetchHandlers } from './handlers/fetch';
 import { BreadcrumbManager } from './breadcrumb';
 
 export class PulseTrace {
@@ -30,6 +31,7 @@ export class PulseTrace {
         setupErrorHandlers();
         setupDomHandlers();
         setupNavigationHandlers();
+        setupFetchHandlers();
 
         if (pt.config.capturePerformance) {
             setupPerformanceHandlers();
