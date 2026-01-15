@@ -11,6 +11,9 @@ GitHub Packages requires a Personal Access Token (PAT) for authentication.
 2. Generate a new token with at least `write:packages`, `read:packages`, and `repo` scopes.
 3. Save this token securely—you will not see it again.
 
+> [!IMPORTANT]
+> When running `npm login`, you MUST use this **Personal Access Token** as your password. Your regular GitHub account password will NOT work and will cause a `401 Unauthorized` error.
+
 ---
 
 ## 🛠️ 2. Local Setup (`.npmrc`)
@@ -62,6 +65,35 @@ Then run:
 ```bash
 npm install @kumardhananjaya/sdk
 ```
+
+## 🆘 Troubleshooting (Still getting 401?)
+If you are still getting `401 Unauthorized` after following the steps above, try this "Clean Slate" approach:
+
+1. **Delete conflicting configs**:
+   In your terminal, run:
+   ```bash
+   rm sdk/.npmrc
+   rm ~/.npmrc
+   ```
+2. **Re-Verify Token Scopes**:
+   Ensure your GitHub PAT has **EXACTLY** these boxes checked:
+   - `write:packages`
+   - `read:packages`
+   - `repo` (all sub-boxes)
+
+3. **Manual Token Injection**:
+   Create a new `sdk/.npmrc` with this EXACT format (replace `YOUR_TOKEN_HERE`):
+   ```bash
+   @kumardhananjaya:registry=https://npm.pkg.github.com/
+   //npm.pkg.github.com/:_authToken=YOUR_TOKEN_HERE
+   ```
+   *(Wait 2 minutes after generating the token—sometimes GitHub takes a moment to propagate permissions.)*
+
+4. **Final Attempt**:
+   ```bash
+   cd sdk
+   npm publish
+   ```
 
 ## ⚠️ Notes
 - **Scope Consistency**: The package name must be `@your-username/sdk`. I have already updated `package.json` to `@kumardhananjaya/sdk`.
