@@ -1,6 +1,8 @@
-![PulseTrace Hero](./assets/readme/hero.png)
-
 <div align="center">
+  <img src="./assets/readme/hero.png" width="100%" alt="PulseTrace Hero" />
+
+  <br />
+
   <h1>PulseTrace 🚀</h1>
   <p><strong>Open-source, enterprise-grade telemetry and error tracking for the modern web.</strong></p>
 
@@ -9,6 +11,8 @@
   [![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=flat&logo=vite&logoColor=white)](https://vitejs.dev/)
   [![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=flat&logo=express&logoColor=%2361DAFB)](https://expressjs.com/)
   [![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=flat&logo=Prisma&logoColor=white)](https://api.prisma.io/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 </div>
 
 ---
@@ -17,57 +21,57 @@
 
 PulseTrace is a high-performance monitoring platform designed to provide developers with deep insights into application health, performance, and reliability. Built with a focus on developer experience and low-latency data processing, PulseTrace handles everything from real-time event streaming to historical uptime analysis.
 
-### Why PulseTrace?
+### Core Pillars
 
-*   **⚡ High-Throughput Ingestion**: Batched event processing powered by Redis and BullMQ.
-*   **📊 Web Vitals Intelligence**: Native support for LCP, INP, and CLS monitoring.
-*   **🌐 Global Uptime**: Distributed monitoring checkpoints with 24-hour history visuals.
-*   **🔍 Structured Logging**: Powerful log explorer with real-time level filtering.
-*   **🛡️ Enterprise Auth**: Secure OAuth integration and project-level session management.
+*   **⚡ Velocity**: High-throughput ingestion powered by Redis and BullMQ sidecar workers.
+*   **📊 Insights**: Native support for Core Web Vitals (LCP, INP, CLS) with precision tracking.
+*   **🌐 Persistence**: Global uptime monitoring with a 24-hour historical audit trail.
+*   **🔍 Clarity**: Structured log explorer with real-time level filtering and metadata inspection.
+*   **🛡️ Security**: Enterprise-grade OAuth 2.0 integration and project-scoped sessions.
 
 ---
 
 ## ✨ Features
 
-### 📊 Real-World Performance Monitoring
-Track exactly how your users experience your site. PulseTrace captures Core Web Vitals and provides device/browser breakdowns to identify bottlenecks instantly.
+### 📊 Real-World Performance
+Analyze how real users experience your application. Identify slow interactions, layout shifts, or large paint times across different devices and browsers.
 
-![Performance Monitoring](./assets/readme/performance.png)
+<img src="./assets/readme/performance.png" width="100%" alt="Performance Monitoring" />
 
-### 🌐 Availability & Uptime
-Stop guessing. Monitor your endpoints globally and visualize availability trends with our high-fidelity status bars.
+### 🌐 Global Availability
+Monitor your endpoints from various checkpoints and visualize uptime trends with interactive status bars.
 
-![Uptime Monitoring](./assets/readme/uptime.png)
+<img src="./assets/readme/uptime.png" width="100%" alt="Uptime Monitoring" />
 
-### 🩺 Real-time Diagnostics
-View incoming events as they happen. Our live feed and structured log explorer make debugging in production a breeze.
+### 🩺 Real-time Intelligence
+Observe your system as it moves. The real-time diagnostics feed and logs explorer provide an instant window into your production environment.
 
-![Real-time Feed](./assets/readme/realtime.png)
+<img src="./assets/readme/realtime.png" width="100%" alt="Real-time Feed" />
 
 ---
 
 ## 🏗️ Architecture
 
-PulseTrace uses a robust, decoupled architecture to ensure scalability and reliability.
+PulseTrace uses a robust, decoupled architecture to ensure horizontal scalability.
 
 ```mermaid
 graph TD
-    subgraph "Client Tier"
+    subgraph "Client Layer"
         Browser[Web Browser] -->|Batched Events| SDK["@pulsetrace/sdk"]
         Mobile[Mobile App] -->|Captured Errors| SDK
     end
 
-    subgraph "Ingestion Tier"
+    subgraph "Ingestion Layer"
         SDK -->|POST /api/collect| API[Express API]
         API -->|Enqueue| Redis[(Redis / BullMQ)]
     end
 
-    subgraph "Processing Tier"
+    subgraph "Data Pipeline"
         Redis -->|Dequeue| Worker[Event Worker]
         Worker -->|Sanitize & Store| DB[(PostgreSQL)]
     end
 
-    subgraph "Visualization Tier"
+    subgraph "Observability Layer"
         DB -->|Query| Dashboard[React Dashboard]
         Dashboard -->|Manage| Settings[Project Settings]
     end
@@ -75,66 +79,57 @@ graph TD
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
-### Prerequisites
+### 1. Requirements
 
 *   **Node.js** (v18+)
 *   **Docker** (for Redis and PostgreSQL)
-*   **npm** (v10+)
+*   **Git**
 
-### 1. Infrastructure Setup
-
-The easiest way to get PulseTrace running is via Docker Compose:
+### 2. Launch Infrastructure
 
 ```bash
 docker-compose up -d
 ```
 
-### 2. Installation
-
-Install dependencies across the monorepo:
+### 3. Install & Build
 
 ```bash
+# Install root and workspace dependencies
 npm install
+
+# Build all packages via Turbo
+npm run build
 ```
 
-### 3. Environment Configuration
-
-Copy the example environment files and update them with your credentials:
-
-```bash
-cp api/.env.example api/.env
-cp dashboard/.env.example dashboard/.env
-```
-
-### 4. Running the Development Suite
-
-Start all services (API, Dashboard, Worker) concurrently using Turbo:
+### 4. Start Development
 
 ```bash
 npm run dev
 ```
 
+The services will be available at:
+- **Dashboard**: `http://localhost:5173`
+- **API**: `http://localhost:3001`
+
 ---
 
-## 📦 SDK Integration
+## 📦 SDK Installation
 
-Integrate PulseTrace into your application in under 60 seconds.
+Integrate PulseTrace into your application in under a minute.
 
-### Install
 ```bash
 npm install @pulsetrace/sdk
 ```
 
-### Initialize
 ```typescript
 import { PulseTrace } from '@pulsetrace/sdk';
 
 PulseTrace.init({
-  dsn: "https://api.pulsetrace.com/collect?api_key=YOUR_PROJECT_KEY",
+  dsn: "https://api.pulsetrace.com/collect?api_key=YOUR_KEY",
   environment: "production",
-  release: "1.2.0"
+  release: "1.0.0"
 });
 ```
 
@@ -142,10 +137,9 @@ PulseTrace.init({
 
 ## 🛠️ Tech Stack
 
-*   **Frontend**: React 18, Vite, Tailwind CSS, Lucide Icons
+*   **Frontend**: React, Vite, Tailwind CSS, Lucide
 *   **Backend**: Node.js, Express, TypeScript
-*   **Database & ORM**: PostgreSQL, Prisma
-*   **Caching & Queues**: Redis, BullMQ
+*   **Ops**: BullMQ, Redis, PostgreSQL, Prisma
 *   **Monorepo**: TurboRepo
 
 ---
