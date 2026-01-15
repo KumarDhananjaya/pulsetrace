@@ -1,7 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { IssuesList } from './pages/IssuesList';
 import { IssueDetails } from './pages/IssueDetails';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { Login } from './pages/Login';
 
 // Placeholder components for other pages
 const Overview = () => (
@@ -30,21 +32,46 @@ const Performance = () => <h2 className="text-3xl font-bold text-white italic">P
 const Realtime = () => <h2 className="text-3xl font-bold text-white italic">Real-time Feed</h2>;
 const Settings = () => <h2 className="text-3xl font-bold text-white italic">Settings</h2>;
 
+function RequireAuth({ children }: { children: JSX.Element }) {
+    const { isAuthenticated, loading } = useAuth();
+    const location = useLocation();
+
+    if (loading) {
+        return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-500">Loading...</div>;
+    }
+
+    if (!isAuthenticated) {
+        return <Navigate to="/login" state={{ from: location }} replace />;
+    }
+
+    return children;
+}
+
 function App() {
     return (
-        <Router>
-            <Layout>
+        <AuthProvider>
+            <Router>
                 <Routes>
-                    <Route path="/" element={<Overview />} />
-                    <Route path="/issues" element={<IssuesList />} />
-                    <Route path="/issues/:id" element={<IssueDetails />} />
-                    <Route path="/performance" element={<Performance />} />
-                    <Route path="/realtime" element={<Realtime />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="*" element={<Navigate to="/" replace />} />
+                    <Route path="/login" element={<Login />} />
+
+                    <Route path="/*" element={
+                        <RequireAuth>
+                            <Layout>
+                                <Routes>
+                                    <Route path="/" element={<Overview />} />
+                                    <Route path="/issues" element={<IssuesList />} />
+                                    <Route path="/issues/:id" element={<IssueDetails />} />
+                                    <Route path="/performance" element={<Performance />} />
+                                    <Route path="/realtime" element={<Realtime />} />
+                                    <Route path="/settings" element={<Settings />} />
+                                    <Route path="*" element={<Navigate to="/" replace />} />
+                                </Routes>
+                            </Layout>
+                        </RequireAuth>
+                    } />
                 </Routes>
-            </Layout>
-        </Router>
+            </Router>
+        </AuthProvider>
     );
 }
 

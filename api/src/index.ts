@@ -6,6 +6,7 @@ import { collectionRateLimiter } from './middleware/rateLimiter';
 import { addEventToQueue } from './queues/eventQueue';
 import { BatchEventSchema } from './validators/event';
 import artifactRoutes from './routes/artifacts';
+import authRoutes from './routes/auth';
 import './workers/eventWorker'; // Start the worker
 
 dotenv.config();
@@ -16,6 +17,10 @@ const port = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
+
+// Public Routes
+app.use('/auth', authRoutes);
+
 // Register Artifact Upload Routes (Needs to handle multipart/form-data, so we mount it separately or ensure body parser doesn't conflict)
 app.use('/api', artifactRoutes);
 
