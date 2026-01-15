@@ -7,6 +7,7 @@ import { addEventToQueue } from './queues/eventQueue';
 import { BatchEventSchema } from './validators/event';
 import artifactRoutes from './routes/artifacts';
 import authRoutes from './routes/auth';
+import projectRoutes from './routes/projects';
 import { authenticate, AuthRequest } from './middleware/auth';
 import './workers/eventWorker'; // Start the worker
 
@@ -21,6 +22,9 @@ app.use(express.json());
 
 // Public Routes
 app.use('/auth', authRoutes);
+
+// Protected Routes
+app.use('/api/projects', projectRoutes);
 
 // Register Artifact Upload Routes (Needs to handle multipart/form-data, so we mount it separately or ensure body parser doesn't conflict)
 app.use('/api', artifactRoutes);

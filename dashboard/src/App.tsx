@@ -4,6 +4,9 @@ import { IssuesList } from './pages/IssuesList';
 import { IssueDetails } from './pages/IssueDetails';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Login } from './pages/Login';
+import { Register } from './pages/Register';
+import { NewProject } from './pages/NewProject';
+import { ProjectSettings } from './pages/ProjectSettings';
 
 // Placeholder components for other pages
 const Overview = () => (
@@ -53,6 +56,7 @@ function App() {
             <Router>
                 <Routes>
                     <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
 
                     <Route path="/*" element={
                         <RequireAuth>
@@ -61,6 +65,8 @@ function App() {
                                     <Route path="/" element={<Overview />} />
                                     <Route path="/issues" element={<IssuesList />} />
                                     <Route path="/issues/:id" element={<IssueDetails />} />
+                                    <Route path="/projects/new" element={<NewProject />} />
+                                    <Route path="/settings/projects/:id" element={<ProjectSettings />} />
                                     <Route path="/performance" element={<Performance />} />
                                     <Route path="/realtime" element={<Realtime />} />
                                     <Route path="/settings" element={<Settings />} />
