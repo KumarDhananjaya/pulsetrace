@@ -1,4 +1,4 @@
-import { Terminal, Activity, Zap, Shield, Search } from 'lucide-react';
+import { Activity, Zap } from 'lucide-react';
 import { useDemoData } from '../hooks/useDemoData';
 
 export const Realtime = () => {

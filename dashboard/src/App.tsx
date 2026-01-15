@@ -22,6 +22,15 @@ import { MobileSDK } from './pages/docs/MobileSDK';
 import { NodeSDK } from './pages/docs/NodeSDK';
 import { IngestionAPI } from './pages/docs/IngestionAPI';
 import { IdentityAPI } from './pages/docs/IdentityAPI';
+import { Realtime } from './pages/Realtime';
+import { ProjectSettingsFull } from './pages/ProjectSettingsFull';
+import { DocsLayout } from './components/DocsLayout';
+import { Quickstart } from './pages/docs/Quickstart';
+import { SDKIntegration } from './pages/docs/SDKIntegration';
+import { MobileSDK } from './pages/docs/MobileSDK';
+import { NodeSDK } from './pages/docs/NodeSDK';
+import { IngestionAPI } from './pages/docs/IngestionAPI';
+import { Architecture } from './pages/docs/Architecture';
 
 // Placeholder components for other pages
 const Overview = () => (
@@ -45,9 +54,6 @@ const Overview = () => (
         </div>
     </div>
 );
-
-const Realtime = () => <h2 className="text-3xl font-bold text-white italic">Real-time Feed</h2>;
-const Settings = () => <h2 className="text-3xl font-bold text-white italic">Settings</h2>;
 
 function RequireAuth({ children }: { children: JSX.Element }) {
     const { isAuthenticated, loading } = useAuth();
@@ -90,7 +96,7 @@ function App() {
                                     <Route path="/uptime" element={<Uptime />} />
                                     <Route path="/logs" element={<Logs />} />
                                     <Route path="/realtime" element={<Realtime />} />
-                                    <Route path="/settings" element={<Settings />} />
+                                    <Route path="/settings" element={<ProjectSettingsFull />} />
                                     <Route path="*" element={<Navigate to="/app" replace />} />
                                 </Routes>
                             </Layout>

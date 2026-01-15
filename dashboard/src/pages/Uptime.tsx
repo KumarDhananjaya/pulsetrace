@@ -1,9 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Plus, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Plus, CheckCircle, XCircle, Clock, Zap, Globe, Activity } from 'lucide-react';
+import { useDemoData } from '../hooks/useDemoData';
+
+const UptimeBar = ({ history }: { history: any[] }) => (
+    <div className="flex gap-[2px] h-8 items-end w-full">
+        {(history || Array.from({ length: 48 })).map((h, i) => (
+            <div
+                key={i}
+                className={`flex-1 rounded-sm transition-all hover:scale-y-125 cursor-pointer ${h?.status === 'up' ? 'bg-emerald-500/40 hover:bg-emerald-400' : 'bg-rose-500/40 hover:bg-rose-400'
+                    }`}
+                style={{ height: h ? '100%' : '60%' }}
+                title={`${h?.timestamp}: ${h?.status === 'up' ? 'Online' : 'Offline'}`}
+            ></div>
+        ))}
+    </div>
+);
 
 export const Uptime = () => {
     const { user } = useAuth();
+    const demoData = useDemoData(true);
     const [monitors, setMonitors] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -13,13 +29,6 @@ export const Uptime = () => {
     const [url, setUrl] = useState('');
 
     const fetchMonitors = () => {
-        // For MVP we need to know WHICH project context we are in.
-        // If the user navigates from "Projects > Settings", they are in a project.
-        // If they click "Uptime" in sidebar, we might need to pick a default project or show ALL.
-        // Let's assume we list monitors for the FIRST project found for now, or require project selection.
-        // BETTER: Fetch a list of user's projects first? 
-        // SIMPLIFICATION: We will fetch /api/projects first, then pick the first one to show monitors for.
-
         fetch('http://localhost:3001/api/projects', {
             credentials: 'include'
         })
@@ -41,14 +50,13 @@ export const Uptime = () => {
 
     useEffect(() => {
         if (user) fetchMonitors();
-        const interval = setInterval(fetchMonitors, 10000); // Poll every 10s
+        const interval = setInterval(fetchMonitors, 10000);
         return () => clearInterval(interval);
     }, [user]);
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            // Fetch projects again to get ID (hacky, should utilize context)
             const projects = await fetch('http://localhost:3001/api/projects', {
                 credentials: 'include'
             }).then(res => res.json());
@@ -78,78 +86,126 @@ export const Uptime = () => {
     };
 
     return (
-        <div className="space-y-6 animate-in fade-in">
+        <div className="space-y-10 animate-in fade-in duration-700">
             <div className="flex justify-between items-center">
                 <div>
-                    <h2 className="text-3xl font-bold text-white">Uptime Monitors</h2>
-                    <p className="text-slate-400 mt-1">Status checks for your endpoints</p>
+                    <h2 className="text-4xl font-extrabold text-white tracking-tight">Availability</h2>
+                    <p className="text-slate-400 mt-2 text-lg">Global uptime monitoring and latency tracking.</p>
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl flex items-center gap-2 font-bold shadow-lg shadow-indigo-900/20 transition-all active:scale-95"
                 >
-                    <Plus size={18} />
-                    Add Monitor
+                    <Plus size={20} />
+                    New Monitor
                 </button>
             </div>
 
-            <div className="grid gap-4">
-                {monitors.map((m: any) => (
-                    <div key={m.id} className="bg-slate-900 border border-slate-800 rounded-lg p-5 flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className={`p-3 rounded-full ${m.status === 'up' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
-                                {m.status === 'up' ? <CheckCircle size={24} /> : <XCircle size={24} />}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center gap-4">
+                    <div className="p-3 bg-emerald-500/10 text-emerald-500 rounded-2xl"><CheckCircle size={28} /></div>
+                    <div>
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">Global Health</p>
+                        <p className="text-2xl font-bold text-white mt-1">99.98%</p>
+                    </div>
+                </div>
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center gap-4">
+                    <div className="p-3 bg-indigo-500/10 text-indigo-400 rounded-2xl"><Zap size={28} /></div>
+                    <div>
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">Avg Latency</p>
+                        <p className="text-2xl font-bold text-white mt-1">142ms</p>
+                    </div>
+                </div>
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center gap-4">
+                    <div className="p-3 bg-amber-500/10 text-amber-500 rounded-2xl"><Globe size={28} /></div>
+                    <div>
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">Check Points</p>
+                        <p className="text-2xl font-bold text-white mt-1">12 Latency</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                {monitors.length > 0 ? monitors.map((m: any) => (
+                    <div key={m.id} className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6 group hover:border-indigo-500/30 transition-all">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className={`p-4 rounded-2xl ${m.status === 'up' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
+                                    {m.status === 'up' ? <CheckCircle size={24} /> : <XCircle size={24} />}
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-white text-xl tracking-tight">{m.name}</h3>
+                                    <a href={m.url} target="_blank" className="text-slate-400 text-sm hover:text-indigo-400 transition-colors flex items-center gap-1">
+                                        <Globe size={12} /> {m.url}
+                                    </a>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-bold text-white text-lg">{m.name}</h3>
-                                <a href={m.url} target="_blank" className="text-slate-400 text-sm hover:underline">{m.url}</a>
+                            <div className="text-right">
+                                <div className="text-2xl font-bold text-white">100%</div>
+                                <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Uptime 24h</div>
                             </div>
                         </div>
 
-                        <div className="text-right space-y-1">
-                            <div className="flex items-center gap-2 justify-end text-slate-300">
-                                <Clock size={14} />
-                                <span className="text-sm font-mono">{m.lastCheck ? new Date(m.lastCheck).toLocaleTimeString() : 'Pending'}</span>
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+                                <span>24 hours ago</span>
+                                <span>Present</span>
                             </div>
-                            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
-                                {m.status}
-                            </span>
+                            <UptimeBar history={demoData?.uptimeHistory || []} />
                         </div>
                     </div>
-                ))}
-
-                {monitors.length === 0 && !loading && (
-                    <div className="text-center py-12 text-slate-500">
-                        No monitors configured. Add one to start tracking.
+                )) : (
+                    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6 group">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="p-4 rounded-2xl bg-emerald-500/10 text-emerald-500">
+                                    <CheckCircle size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-white text-xl tracking-tight">Main API Gate</h3>
+                                    <p className="text-slate-400 text-sm">https://api.pulsetrace.com/health</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-2xl font-bold text-white">99.9%</div>
+                                <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Demo Status</div>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+                                <span>24 hours ago</span>
+                                <span>Present</span>
+                            </div>
+                            <UptimeBar history={demoData?.uptimeHistory || []} />
+                        </div>
                     </div>
                 )}
             </div>
 
-            {/* Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-                    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 w-full max-w-md">
-                        <h3 className="text-xl font-bold text-white mb-4">Add New Monitor</h3>
-                        <form onSubmit={handleCreate} className="space-y-4">
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 w-full max-w-md shadow-2xl">
+                        <h3 className="text-2xl font-bold text-white mb-6">Add New Monitor</h3>
+                        <form onSubmit={handleCreate} className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-1">Name</label>
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Display Name</label>
                                 <input
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white"
+                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                                     value={name} onChange={e => setName(e.target.value)}
-                                    placeholder="e.g. Landing Page" required
+                                    placeholder="e.g. Production API" required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-1">URL</label>
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Target URL</label>
                                 <input
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white"
+                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                                     value={url} onChange={e => setUrl(e.target.value)}
-                                    placeholder="https://example.com" type="url" required
+                                    placeholder="https://api.example.com/health" type="url" required
                                 />
                             </div>
-                            <div className="flex justify-end gap-2 pt-4">
-                                <button type="button" onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white px-4 py-2">Cancel</button>
-                                <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded-lg">Create</button>
+                            <div className="flex justify-end gap-4 pt-4">
+                                <button type="button" onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white font-bold px-4 py-2">Cancel</button>
+                                <button type="submit" className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-900/40 hover:bg-indigo-500 transition-all active:scale-95">Create Monitor</button>
                             </div>
                         </form>
                     </div>
