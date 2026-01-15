@@ -7,6 +7,7 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { NewProject } from './pages/NewProject';
 import { ProjectSettings } from './pages/ProjectSettings';
+import { Performance } from './pages/Performance';
 
 // Placeholder components for other pages
 const Overview = () => (
@@ -31,7 +32,6 @@ const Overview = () => (
     </div>
 );
 
-const Performance = () => <h2 className="text-3xl font-bold text-white italic">Performance Metrics</h2>;
 const Realtime = () => <h2 className="text-3xl font-bold text-white italic">Real-time Feed</h2>;
 const Settings = () => <h2 className="text-3xl font-bold text-white italic">Settings</h2>;
 

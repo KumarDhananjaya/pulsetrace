@@ -48,9 +48,10 @@ export interface PulseEvent {
         stacktrace?: string;
     };
     breadcrumbs?: Breadcrumb[];
-    metrics?: Metric[];
+    metrics?: Record<string, any>;
     network?: NetworkRequest;
     contexts?: Record<string, any>;
+    type?: string; // 'error' | 'perf' | 'transaction'
     environment?: string;
     release?: string;
     extra?: Record<string, any>;

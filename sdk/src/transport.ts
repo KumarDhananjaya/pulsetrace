@@ -138,3 +138,6 @@ export class Transport {
         });
     }
 }
+
+// Default singleton instance with "empty" config until init() is called
+export const transport = new Transport('');

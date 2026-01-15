@@ -8,12 +8,13 @@ import { setupPerformanceHandlers } from './handlers/performance';
 import { setupFetchHandlers } from './handlers/fetch';
 import { BreadcrumbManager } from './breadcrumb';
 import { getContexts } from './metadata';
+import { setupVitals } from './vitals';
 
 export class PulseTrace {
     private static instance: PulseTrace;
     private initialized = false;
     private config!: PulseConfig;
-    private transport!: Transport;
+    public transport!: Transport;
     private breadcrumbs!: BreadcrumbManager;
 
     public static init(config: PulseConfig) {
@@ -24,7 +25,15 @@ export class PulseTrace {
             maxBreadcrumbs: 20,
             ...config
         };
+        // Re-initialize the singleton transport with real config
+        // Assuming we modify Transport to allow re-init, or just create new one (but we need to keep the reference the same if Vitals uses it)
+        // Actually, Vitals imports 'transport' variable. We need to update that object or expose a way to set it.
+        // Better: let's expose a method on the exported instance.
+
+        // For now, let's just assign it to the instance prop
         pt.transport = new Transport(config.dsn, config.flushInterval, config.maxBatchSize);
+        // AND update the exported singleton? No, that's messy.
+        // Let's change vitals.ts to use PulseTrace.sendEvent
         pt.breadcrumbs = new BreadcrumbManager(pt.config.maxBreadcrumbs);
         pt.initialized = true;
 
@@ -36,6 +45,7 @@ export class PulseTrace {
 
         if (pt.config.capturePerformance) {
             setupPerformanceHandlers();
+            setupVitals();
         }
 
         if (config.debug) console.log('PulseTrace SDK Initialized');
@@ -54,7 +64,19 @@ export class PulseTrace {
         pt.sendEvent({
             level: 'info',
             message: `Metric: ${metric.name}`,
-            metrics: [metric],
+            metrics: { [metric.name]: metric.value },
+        });
+    }
+
+    public static captureMetricEvent(metric: any) {
+        const pt = this.getInstance();
+        if (!pt.initialized) return;
+
+        pt.sendEvent({
+            level: 'info',
+            type: 'perf',
+            message: `Web Vital: ${metric.name}`,
+            metrics: { [metric.name]: metric },
         });
     }
 
