@@ -14,6 +14,9 @@ import { Landing } from './pages/Landing';
 import { Features } from './pages/Features';
 import { Pricing } from './pages/Pricing';
 import { Solutions } from './pages/Solutions';
+import { DocsLayout } from './components/DocsLayout';
+import { Quickstart } from './pages/docs/Quickstart';
+import { SDKIntegration } from './pages/docs/SDKIntegration';
 
 // Placeholder components for other pages
 const Overview = () => (
@@ -38,8 +41,13 @@ const Overview = () => (
     </div>
 );
 
-const Realtime = () => <h2 className="text-3xl font-bold text-white italic">Real-time Feed</h2>;
-const Settings = () => <h2 className="text-3xl font-bold text-white italic">Settings</h2>;
+const Architecture = () => <h2 className="text-3xl font-bold text-white italic">Internal Architecture</h2>;
+const DocsPlaceholder = ({ title }: { title: string }) => (
+    <div className="animate-in fade-in duration-700">
+        <h1 className="text-4xl font-extrabold text-white mb-6 tracking-tight">{title}</h1>
+        <p className="text-xl text-slate-400 leading-relaxed">This section is currently being updated with the latest PulseTrace specifications.</p>
+    </div>
+);
 
 function RequireAuth({ children }: { children: JSX.Element }) {
     const { isAuthenticated, loading } = useAuth();
@@ -88,6 +96,17 @@ function App() {
                             </Layout>
                         </RequireAuth>
                     } />
+                    {/* Documentation Routes */}
+                    <Route path="/docs" element={<DocsLayout />}>
+                        <Route index element={<Navigate to="/docs/quickstart" replace />} />
+                        <Route path="quickstart" element={<Quickstart />} />
+                        <Route path="sdk-web" element={<SDKIntegration />} />
+                        <Route path="sdk-mobile" element={<DocsPlaceholder title="React Native SDK" />} />
+                        <Route path="sdk-node" element={<DocsPlaceholder title="Node.js SDK" />} />
+                        <Route path="api-ingestion" element={<DocsPlaceholder title="Ingestion API" />} />
+                        <Route path="api-identity" element={<DocsPlaceholder title="Identity API" />} />
+                        <Route path="architecture" element={<Architecture />} />
+                    </Route>
 
                     {/* Fallback */}
                     <Route path="*" element={<Navigate to="/" replace />} />

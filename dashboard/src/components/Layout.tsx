@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, AlertCircle, Activity, Settings, BarChart3, Database, LogOut, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, AlertCircle, Activity, Settings, BarChart3, Database, LogOut, ChevronRight, BookOpen } from 'lucide-react';
 
 const SidebarItem = ({ icon: Icon, label, to, active }: { icon: any, label: string, to: string, active: boolean }) => (
     <Link
@@ -104,6 +104,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                         label="Real-time"
                         to="/app/realtime"
                         active={location.pathname === '/app/realtime'}
+                    />
+                    <SidebarItem
+                        icon={BookOpen}
+                        label="Documentation"
+                        to="/docs/quickstart"
+                        active={location.pathname.startsWith('/docs')}
                     />
                 </nav>
 
