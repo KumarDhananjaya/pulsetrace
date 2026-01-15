@@ -47,7 +47,7 @@ app.post('/api/collect', collectionRateLimiter, async (req, res) => {
         if (!result.success) {
             return res.status(400).json({
                 error: 'Invalid Payload',
-                details: result.error.errors
+                details: (result as any).error.issues
             });
         }
 

@@ -24,14 +24,21 @@ export const eventWorker = new Worker(
                     const fingerprint = generateFingerprint(event.message, event.exception.stacktrace);
 
                     // Find or create Issue
+                    // Multi-tenancy: Uniqueness is (projectId + fingerprint)
                     const issue = await prisma.issue.upsert({
-                        where: { fingerprint },
-                        update: { lastSeen: new Date() },
+                        where: {
+                            projectId_fingerprint: {
+                                projectId,
+                                fingerprint
+                            }
+                        },
+                        update: { lastSeen: new Date(), eventsCount: { increment: 1 } },
                         create: {
                             fingerprint,
                             title: event.message,
                             type: event.exception.type || 'Error',
                             projectId,
+                            eventsCount: 1
                         },
                     });
                     issueId = issue.id;
@@ -44,13 +51,14 @@ export const eventWorker = new Worker(
                         timestamp: new Date(event.timestamp),
                         level: event.level,
                         message: event.message,
-                        exception: event.exception || undefined,
-                        breadcrumbs: event.breadcrumbs || undefined,
-                        metrics: event.metrics || undefined,
-                        network: event.network || undefined,
-                        environment: event.environment,
-                        release: event.release,
-                        issueId,
+                        exception: (event.exception || undefined) as any,
+                        breadcrumbs: (event.breadcrumbs || undefined) as any,
+                        metrics: (event.metrics || undefined) as any,
+                        network: (event.network || undefined) as any,
+                        contexts: (event.contexts || undefined) as any,
+                        environment: event.environment || null,
+                        release: event.release || null,
+                        issueId: issueId || null,
                     },
                 });
             } catch (err) {

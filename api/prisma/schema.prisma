@@ -109,14 +109,17 @@ model Event {
   // Context Data (JSONB for flexibility)
   exception     Json?        // { type: "TypeError", value: "x is null", stacktrace: ... }
   breadcrumbs   Json?        // [ { type: "click", category: "ui", ... } ]
+  metrics       Json?        // Performance metrics
   contexts      Json?        // { os: { name: "Mac OS" }, browser: { name: "Chrome" } }
-  request       Json?        // { url: "...", method: "POST" }
+  network       Json?        // { url: "...", method: "POST" }
   user          Json?        // { id: "123", email: "..." }
   tags          Json?        // { release: "v1.0.1", environment: "production" }
+  environment   String?
+  release       String?
   
   // Hierarchy
-  issueId       String
-  issue         Issue        @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  issueId       String?
+  issue         Issue?       @relation(fields: [issueId], references: [id], onDelete: Cascade)
   
   createdAt     DateTime     @default(now())
 
