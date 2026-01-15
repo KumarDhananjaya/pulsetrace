@@ -25,7 +25,7 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
-app.use(cookieParser());
+app.use(cookieParser() as any);
 app.use(express.json());
 
 // Public Routes
