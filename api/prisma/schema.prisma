@@ -73,6 +73,34 @@ model Project {
   
   // Relations
   issues        Issue[]
+  releases      Release[]
+}
+
+model Release {
+  id        String     @id @default(uuid())
+  version   String     // e.g., "v1.0.0"
+  
+  projectId String
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  artifacts Artifact[]
+  
+  createdAt DateTime   @default(now())
+  
+  @@unique([projectId, version])
+}
+
+model Artifact {
+  id        String   @id @default(uuid())
+  filename  String   // e.g., "~/app.js"
+  filepath  String   // Local path: "uploads/<project>/<release>/app.js"
+  type      String   // "source_map" | "minified_source"
+  size      Int
+  
+  releaseId String
+  release   Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
 }
 
 model Issue {

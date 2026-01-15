@@ -3,6 +3,7 @@ import { redis } from '../config/redis';
 import { PrismaClient } from '@prisma/client';
 import { scrubPII } from '../utils/scrubber';
 import { generateFingerprint } from '../utils/fingerprinter';
+import { resolveStacktrace } from '../utils/sourcemaps';
 import { EVENT_QUEUE_NAME } from '../queues/eventQueue';
 
 const prisma = new PrismaClient();
@@ -18,7 +19,23 @@ export const eventWorker = new Worker(
                 // 1. Scrub PII
                 const event = scrubPII(rawEvent);
 
-                // 2. Handle Exceptions/Fingerprinting
+                // 2. Resolve Source Maps (if Exception)
+                if (event.exception && event.exception.stacktrace && event.release) {
+                    try {
+                        const resolvedStack = await resolveStacktrace(
+                            event.exception.stacktrace,
+                            event.release,
+                            projectId
+                        );
+                        if (resolvedStack) {
+                            event.exception.stacktrace = resolvedStack;
+                        }
+                    } catch (e) {
+                        console.error('Source map resolution failed:', e);
+                    }
+                }
+
+                // 3. Handle Exceptions/Fingerprinting
                 let issueId: string | undefined;
                 if (event.exception) {
                     const fingerprint = generateFingerprint(event.message, event.exception.stacktrace);

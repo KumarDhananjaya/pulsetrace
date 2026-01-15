@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { collectionRateLimiter } from './middleware/rateLimiter';
 import { addEventToQueue } from './queues/eventQueue';
 import { BatchEventSchema } from './validators/event';
+import artifactRoutes from './routes/artifacts';
 import './workers/eventWorker'; // Start the worker
 
 dotenv.config();
@@ -15,6 +16,8 @@ const port = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
+// Register Artifact Upload Routes (Needs to handle multipart/form-data, so we mount it separately or ensure body parser doesn't conflict)
+app.use('/api', artifactRoutes);
 
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', service: 'pulsetrace-api' });
