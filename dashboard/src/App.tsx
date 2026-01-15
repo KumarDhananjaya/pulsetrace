@@ -18,6 +18,10 @@ import { DocsLayout } from './components/DocsLayout';
 import { Quickstart } from './pages/docs/Quickstart';
 import { SDKIntegration } from './pages/docs/SDKIntegration';
 import { Architecture } from './pages/docs/Architecture';
+import { MobileSDK } from './pages/docs/MobileSDK';
+import { NodeSDK } from './pages/docs/NodeSDK';
+import { IngestionAPI } from './pages/docs/IngestionAPI';
+import { IdentityAPI } from './pages/docs/IdentityAPI';
 
 // Placeholder components for other pages
 const Overview = () => (
@@ -103,10 +107,10 @@ function App() {
                         <Route index element={<Navigate to="/docs/quickstart" replace />} />
                         <Route path="quickstart" element={<Quickstart />} />
                         <Route path="sdk-web" element={<SDKIntegration />} />
-                        <Route path="sdk-mobile" element={<DocsPlaceholder title="React Native SDK" />} />
-                        <Route path="sdk-node" element={<DocsPlaceholder title="Node.js SDK" />} />
-                        <Route path="api-ingestion" element={<DocsPlaceholder title="Ingestion API" />} />
-                        <Route path="api-identity" element={<DocsPlaceholder title="Identity API" />} />
+                        <Route path="sdk-mobile" element={<MobileSDK />} />
+                        <Route path="sdk-node" element={<NodeSDK />} />
+                        <Route path="api-ingestion" element={<IngestionAPI />} />
+                        <Route path="api-identity" element={<IdentityAPI />} />
                         <Route path="architecture" element={<Architecture />} />
                     </Route>
 
