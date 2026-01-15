@@ -1,4 +1,4 @@
-import { Terminal, Database, Shield, Zap, Info } from 'lucide-react';
+import { Terminal } from 'lucide-react';
 
 const CodeBlock = ({ code, language }: { code: string, language: string }) => (
     <div className="relative group my-8">

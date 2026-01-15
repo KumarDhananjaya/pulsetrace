@@ -48,12 +48,6 @@ const Overview = () => (
 
 const Realtime = () => <h2 className="text-3xl font-bold text-white italic">Real-time Feed</h2>;
 const Settings = () => <h2 className="text-3xl font-bold text-white italic">Settings</h2>;
-const DocsPlaceholder = ({ title }: { title: string }) => (
-    <div className="animate-in fade-in duration-700">
-        <h1 className="text-4xl font-extrabold text-white mb-6 tracking-tight">{title}</h1>
-        <p className="text-xl text-slate-400 leading-relaxed">This section is currently being updated with the latest PulseTrace specifications.</p>
-    </div>
-);
 
 function RequireAuth({ children }: { children: JSX.Element }) {
     const { isAuthenticated, loading } = useAuth();

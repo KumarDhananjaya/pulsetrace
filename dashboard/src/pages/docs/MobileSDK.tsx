@@ -1,5 +1,4 @@
-import { Smartphone, Zap, Shield, Layers, ArrowRight, Terminal } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Smartphone, Zap, Shield, Layers, Terminal } from 'lucide-react';
 
 const CodeBlock = ({ code, language }: { code: string, language: string }) => (
     <div className="relative group my-8">

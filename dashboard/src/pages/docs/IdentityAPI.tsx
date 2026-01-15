@@ -1,19 +1,4 @@
-import { Shield, Lock, Key, Users, Terminal, Info } from 'lucide-react';
-
-const CodeBlock = ({ code, language }: { code: string, language: string }) => (
-    <div className="relative group my-8">
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-xl blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-        <div className="relative bg-slate-900 rounded-xl overflow-hidden border border-slate-800/50">
-            <div className="px-4 py-2 border-b border-slate-800 flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                <span>{language}</span>
-                <button className="hover:text-white transition-colors"><Terminal size={12} /></button>
-            </div>
-            <pre className="p-6 overflow-x-auto">
-                <code className="text-sm text-indigo-300 font-mono leading-relaxed">{code}</code>
-            </pre>
-        </div>
-    </div>
-);
+import { Lock, Key, Users } from 'lucide-react';
 
 export const IdentityAPI = () => {
     return (
