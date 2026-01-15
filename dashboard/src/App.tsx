@@ -42,7 +42,6 @@ const Overview = () => (
     </div>
 );
 
-const Architecture = () => <h2 className="text-3xl font-bold text-white italic">Internal Architecture</h2>;
 const Realtime = () => <h2 className="text-3xl font-bold text-white italic">Real-time Feed</h2>;
 const Settings = () => <h2 className="text-3xl font-bold text-white italic">Settings</h2>;
 const DocsPlaceholder = ({ title }: { title: string }) => (
