@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="./assets/readme/hero.png" width="100%" alt="PulseTrace Hero" />
 
   <br />
 
